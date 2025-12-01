@@ -1,0 +1,8 @@
+# Fichiers de données générés et gros fichiers
+data/raw/
+data/interim/
+data/processed/
+
+# Fichiers Python/Jupyter/Environnement
+__pycache__/
+*.ipynb_checkpoints/
