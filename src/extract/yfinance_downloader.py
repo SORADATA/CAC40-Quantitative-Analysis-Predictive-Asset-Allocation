@@ -39,7 +39,8 @@ def download_cac40_history(start="2010-01-01", end=None, interval="1d"):
     for ticker in CAC40_TICKERS:
         try:
             print(f"📥 Téléchargement : {ticker}")
-            df = yf.download(ticker, start=start, end=end, interval=interval, auto_adjust=False)
+            # On passe auto_adjust à True pour capturer la performance réelle (dividendes inclus
+            df = yf.download(ticker, start=start, end=end, interval=interval, auto_adjust=True)
             
             if df.empty:
                 print(f"⚠️ Aucune donnée pour {ticker}")
