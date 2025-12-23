@@ -1,7 +1,0 @@
-Volume
-Returns
-Volatility
-Performance_20D
-Sharpe_Ratio_20D
-Dividends
-Cluster

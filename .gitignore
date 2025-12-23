@@ -6,3 +6,24 @@ data/processed/
 # Fichiers Python/Jupyter/Environnement
 __pycache__/
 *.ipynb_checkpoints/
+
+# Modèles entraînés
+models/
+*.pkl
+*.h5
+*.keras
+*.joblib
+
+# Images GÉNÉRÉES par les scripts (dans models/)
+models/*.png
+models/*.jpg
+models/advanced/*.png
+
+# Logs et temporaires
+*.log
+logs/
+
+# Configuration système
+.DS_Store
+.vscode/
+*.swp
