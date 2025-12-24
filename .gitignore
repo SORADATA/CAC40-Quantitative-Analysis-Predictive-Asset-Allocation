@@ -2,6 +2,7 @@
 data/raw/
 data/interim/
 data/processed/
+results/
 
 # Fichiers Python/Jupyter/Environnement
 __pycache__/
