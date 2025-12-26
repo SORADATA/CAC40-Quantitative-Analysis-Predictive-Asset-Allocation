@@ -1,6 +1,6 @@
 # 📊 CAC40 Portfolio Optimization: ML-Based Stock Selection & Asset Allocation
 
-> **Master 2 - Portfolio Management | Université de Lorraine**  
+> **Master 2 - Statistics Expertise for Finance & Economics | Université de Lorraine**  
 > Advanced quantitative analysis combining Machine Learning, clustering, and Modern Portfolio Theory for CAC40 stocks
 
 
