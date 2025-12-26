@@ -62,5 +62,10 @@ Segment stocks into 4 behavioral groups based on RSI momentum:
 
 Predict if `return_1m > 0` (stock goes up/down):
 
+[![Status](https://img.shields.io/badge/Status-Work%20in%20Progress-yellow.svg)]()
+[![Completion](https://img.shields.io/badge/Completion-85%25-brightgreen.svg)]()
+[![Master](https://img.shields.io/badge/Master%202-Portfolio%20Management-blue.svg)]()
+
+
 
 
