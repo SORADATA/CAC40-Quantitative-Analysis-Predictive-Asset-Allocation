@@ -57,7 +57,7 @@ def load_data():
         history_df.index.name = 'Date'
         history_df = history_df.sort_index()
     except Exception as e:
-        st.warning(f"⚠️ History not loaded (Waiting for first run): {e}")
+        # Silent error fallback
         history_df = pd.DataFrame(columns=['Strategy', 'Benchmark'])
 
     # B. Latest Signals
@@ -65,7 +65,6 @@ def load_data():
         signals_url = base_url + "latest_signals.csv"
         signals_df = pd.read_csv(signals_url)
     except Exception as e:
-        st.warning(f"⚠️ Signals not loaded: {e}")
         signals_df = pd.DataFrame()
 
     return history_df, signals_df
@@ -115,7 +114,6 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-# Separator (Corrected: No st.help wrapper)
 st.sidebar.markdown("---")
 
 # Navigation
@@ -189,86 +187,136 @@ if page == "🏠 Dashboard & Performance":
                 st.plotly_chart(fig_hist, use_container_width=True)
 
 # -----------------------------------------------------------------------------
-# PAGE 2: SIGNALS
+# PAGE 2: SIGNALS (AVEC CALCULATEUR CAPITAL)
 # -----------------------------------------------------------------------------
 elif page == "🚀 Daily Signals":
-    st.title(" ML Generated Signals")
-    st.markdown("These signals are generated every evening at **18:00 UTC** via GitHub Actions.")
+    st.title("🤖 ML Investment Signals")
+    st.markdown("Signals generated at **18:00 UTC** via GitHub Actions.")
     
     if latest_signals.empty:
-        st.warning("⚠️ No signals available (check if daily_run.py ran successfully on GitHub).")
+        st.warning("⚠️ No signals available yet (Run the GitHub Action first).")
     else:
         col1, col2 = st.columns([2, 1])
         
         with col1:
-            st.subheader(" Investment Watchlist ")
+            st.subheader(" Investment Watchlist (Active Only)")
             
-            # Fetch Live Prices
-            with st.spinner('Fetching live prices from Yahoo Finance...'):
-                try:
-                    tickers_list = latest_signals['Ticker'].tolist()
-                    if tickers_list:
-                        live_data = yf.download(tickers_list, period="1d", progress=False)['Close']
-                        
-                        # Handle Data Structure (Series vs DataFrame)
-                        if isinstance(live_data, pd.Series):
-                             current_prices = {tickers_list[0]: live_data.iloc[-1]}
-                        elif not live_data.empty:
-                            current_prices = live_data.iloc[-1].to_dict()
-                        else:
-                            current_prices = {}
-                        
-                        latest_signals['Last Price'] = latest_signals['Ticker'].map(current_prices)
-                    else:
-                        latest_signals['Last Price'] = 0.0
-                except Exception as e:
-                    st.warning(f"⚠️ Could not fetch live prices: {e}")
-                    latest_signals['Last Price'] = 0.0
-
-            # --- REORDER COLUMNS HERE ---
-            # On force l'ordre des colonnes ici
-            desired_order = ['Ticker', 'Last Price', 'Proba_Hausse', 'Cluster', 'Signal', 'Allocation']
-            # On filtre pour ne garder que les colonnes qui existent vraiment (sécurité)
-            final_cols = [c for c in desired_order if c in latest_signals.columns]
-            latest_signals = latest_signals[final_cols]
-
-            # Formatting Function
-            def highlight_signal(val):
-                if val == 'ACHAT' or val == 'BUY': return 'color: #2ecc71; font-weight: bold'
-                if val == 'VENTE' or val == 'SELL': return 'color: #e74c3c; font-weight: bold'
-                return 'color: #95a5a6'
-
-            # Display Table
-            st.dataframe(
-                latest_signals.style.map(highlight_signal, subset=['Signal'])
-                .format({
-                    'Last Price': '{:.2f} €',
-                    'Proba_Hausse': '{:.1%}', 
-                    'Allocation': '{:.1%}'
-                }, na_rep="-")
-                .background_gradient(subset=['Proba_Hausse'], cmap='Greens'),
-                use_container_width=True,
-                height=500
+            # --- INPUT CAPITAL ---
+            capital = st.number_input(
+                "💰 Capital to Invest (€)", 
+                min_value=100, 
+                value=1000, 
+                step=100,
+                help="Enter your total capital to calculate exact share quantities."
             )
+            st.markdown("---")
+
+            # --- FILTERING LOGIC ---
+            # We ONLY want stocks with Allocation > 0 OR Strong Buy signals
+            if 'Allocation' in latest_signals.columns:
+                active_signals = latest_signals[latest_signals['Allocation'] > 0.001].copy()
+            else:
+                active_signals = latest_signals[latest_signals['Signal'].isin(['ACHAT', 'BUY'])].copy()
+
+            if active_signals.empty:
+                st.info("😴 Strategy is currently **100% CASH**. No stocks to buy today.")
+            else:
+                # --- FETCH LIVE PRICES ---
+                with st.spinner('Fetching live prices & calculating...'):
+                    try:
+                        tickers_list = active_signals['Ticker'].tolist()
+                        if tickers_list:
+                            live_data = yf.download(tickers_list, period="1d", progress=False)['Close']
+                            
+                            if isinstance(live_data, pd.Series):
+                                current_prices = {tickers_list[0]: live_data.iloc[-1]}
+                            elif not live_data.empty:
+                                current_prices = live_data.iloc[-1].to_dict()
+                            else:
+                                current_prices = {}
+                            
+                            active_signals['Last Price'] = active_signals['Ticker'].map(current_prices)
+                        else:
+                            active_signals['Last Price'] = 0.0
+                    except Exception as e:
+                        active_signals['Last Price'] = 0.0
+
+                # --- CALCULATIONS ---
+                if 'Allocation' in active_signals.columns:
+                    # Amount = Allocation * Capital
+                    active_signals['Invest (€)'] = active_signals['Allocation'] * capital
+                    # Shares = Amount / Price (Floored)
+                    active_signals['Shares (Qté)'] = np.where(
+                        active_signals['Last Price'] > 0,
+                        np.floor(active_signals['Invest (€)'] / active_signals['Last Price']),
+                        0
+                    )
+                else:
+                    active_signals['Invest (€)'] = 0
+                    active_signals['Shares (Qté)'] = 0
+
+                # --- DISPLAY ---
+                desired_order = ['Ticker', 'Last Price', 'Proba_Hausse', 'Allocation', 'Invest (€)', 'Shares (Qté)']
+                final_cols = [c for c in desired_order if c in active_signals.columns]
+                active_signals = active_signals[final_cols]
+
+                # Custom Color Function (Dark Green > 70%)
+                def color_proba(val):
+                    if val >= 0.70: 
+                        return 'background-color: #145A32; color: white; font-weight: bold;' # Dark Green
+                    elif val >= 0.60: 
+                        return 'background-color: #28B463; color: white;' # Medium Green
+                    else: 
+                        return 'background-color: #D5F5E3; color: black;' # Light Green
+
+                # Style Config
+                st.dataframe(
+                    active_signals.style
+                    .format({
+                        'Last Price': '{:.2f} €',
+                        'Proba_Hausse': '{:.1%}', 
+                        'Allocation': '{:.1%}',
+                        'Invest (€)': '**{:.2f} €**',
+                        'Shares (Qté)': '{:.0f}'
+                    }, na_rep="-")
+                    .map(color_proba, subset=['Proba_Hausse'])
+                    .background_gradient(subset=['Invest (€)'], cmap='BuGn'),
+                    
+                    use_container_width=True,
+                    height=400,
+                    column_config={
+                        "Allocation": st.column_config.NumberColumn(
+                            "Target Allocation",
+                            help="⚖️ Optimized weight (Markowitz).",
+                            format="%.1f %%"
+                        ),
+                        "Proba_Hausse": st.column_config.NumberColumn(
+                            "ML Confidence",
+                            help="🧠 Probability of upside (XGBoost).",
+                            format="%.1f %%"
+                        ),
+                        "Shares (Qté)": st.column_config.NumberColumn(
+                            "Shares (Qty)",
+                            help="📦 Number of full shares to buy (rounded down)."
+                        )
+                    }
+                )
             
         with col2:
-            st.subheader(" Current Allocation")
-            # On vérifie que la colonne Allocation existe bien avant de filtrer
-            if 'Allocation' in latest_signals.columns:
-                portfolio_active = latest_signals[latest_signals['Allocation'] > 0]
+            st.subheader(" Strategic Allocation")
+            if not active_signals.empty and 'Allocation' in active_signals.columns:
+                fig_pie = px.pie(
+                    active_signals, 
+                    values='Allocation', 
+                    names='Ticker',
+                    hole=0.4, 
+                    color_discrete_sequence=px.colors.sequential.RdBu
+                )
+                fig_pie.update_layout(template="plotly_dark", showlegend=False)
+                st.plotly_chart(fig_pie, use_container_width=True)
                 
-                if not portfolio_active.empty:
-                    fig_pie = px.pie(
-                        portfolio_active, values='Allocation', names='Ticker',
-                        hole=0.4, color_discrete_sequence=px.colors.sequential.RdBu
-                    )
-                    fig_pie.update_layout(template="plotly_dark", showlegend=False)
-                    st.plotly_chart(fig_pie, use_container_width=True)
-                else:
-                    st.info("😴 Portfolio is currently 100% Cash.")
-            else:
-                st.error("Column 'Allocation' not found in data.")
-
+                st.success(f"**Total Invested:** {active_signals['Invest (€)'].sum():.2f} €")
+                st.caption(f"Remaining Cash: {capital - active_signals['Invest (€)'].sum():.2f} €")
 
 # -----------------------------------------------------------------------------
 # PAGE 3: DETAILS
