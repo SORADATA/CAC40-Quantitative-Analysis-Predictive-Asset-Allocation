@@ -116,7 +116,7 @@ st.sidebar.markdown(
 st.sidebar.markdown("---")
 
 # Navigation
-page = st.sidebar.radio("Navigation", [" Dashboard & Performance", " 📈 Daily Signals", "⚙️ Model Details"])
+page = st.sidebar.radio("Navigation", [" Dashboard & Performance", " Daily Signals", "⚙️ Model Details"])
 
 st.sidebar.markdown("---")
 st.sidebar.success("✅ **System Status**: ONLINE")
@@ -135,7 +135,18 @@ if page == " Dashboard & Performance":
     kpi1, kpi2, kpi3, kpi4 = st.columns(4)
     with kpi1: st.metric("Alpha (vs Bench)", f"{alpha:.1%}", delta=f"{alpha*100:.1f} pts")
     with kpi2: st.metric("Sharpe Ratio", f"{sharpe:.2f}", delta="Risk Adj.")
-    with kpi3: st.metric("Max Drawdown", f"{max_dd:.1%}", delta_color="inverse")
+    
+    with kpi3: 
+        st.metric(
+            label=" Max Historical Loss", 
+            value=f"{max_dd:.1%}", 
+            # max_dd est négatif (ex: -30%) -> Flèche BAS par défaut
+            delta=f"{max_dd:.1%}",  
+            # "normal" -> Négatif = ROUGE
+            delta_color="normal"   
+        )
+    # ------------------------
+
     with kpi4: st.metric("Total Return", f"{cum_strat:.1%}", delta="Net of fees")
 
     st.markdown("---")
@@ -162,9 +173,8 @@ if page == " Dashboard & Performance":
             line=dict(width=0), showlegend=False
         ))
 
-        # Correction : on remplace use_container_width=True par le comportement par défaut ou width='stretch' si supporté
         fig_perf.update_layout(template="plotly_dark", height=500, legend=dict(orientation="h", y=1.02))
-        st.plotly_chart(fig_perf, width="stretch")  # <-- CORRECTION ICI (si supporté) ou use_container_width=True supprimé
+        st.plotly_chart(fig_perf, width="stretch")
 
         col_dd, col_dist = st.columns(2)
         with col_dd:
@@ -177,19 +187,19 @@ if page == " Dashboard & Performance":
                     line=dict(color='#E74C3C', width=1), name='Drawdown'
                 ))
                 fig_dd.update_layout(template="plotly_dark", height=350)
-                st.plotly_chart(fig_dd, width="stretch") # <-- CORRECTION ICI
+                st.plotly_chart(fig_dd, width="stretch")
 
         with col_dist:
             st.subheader("📊 Return Distribution")
             if not daily_ret.empty:
                 fig_hist = px.histogram(daily_ret.dropna(), nbins=50, color_discrete_sequence=['#4ECDC4'])
                 fig_hist.update_layout(template="plotly_dark", height=350, showlegend=False)
-                st.plotly_chart(fig_hist, width="stretch") # <-- CORRECTION ICI
+                st.plotly_chart(fig_hist, width="stretch")
 
 # -----------------------------------------------------------------------------
-# PAGE 2: SIGNALS (CORRIGÉ & NETTOYÉ)
+# PAGE 2: SIGNALS 
 # -----------------------------------------------------------------------------
-elif page == "📈 Daily Signals":
+elif page == " Daily Signals":
     st.title("🤖 ML Investment Signals")
     st.markdown("Signals generated at **18:00 UTC** via GitHub Actions.")
     
@@ -281,7 +291,7 @@ elif page == "📈 Daily Signals":
                     .map(color_proba, subset=['Proba_Hausse'])
                     .background_gradient(subset=['Invest (€)'], cmap='BuGn'),
                     
-                    width="stretch",  # <-- CORRECTION ICI : Remplacement de use_container_width=True
+                    width="stretch",
                     height=400,
                     column_config={
                         "Allocation": st.column_config.NumberColumn(
@@ -291,7 +301,7 @@ elif page == "📈 Daily Signals":
                         ),
                         "Proba_Hausse": st.column_config.NumberColumn(
                             "AI Confidence",
-                            help="🧠 Probability of upside (XGBoost).",
+                            help=" Probability of upside (XGBoost).",
                             format="%.1f %%"
                         ),
                         "Shares (Qté)": st.column_config.NumberColumn(
@@ -312,7 +322,7 @@ elif page == "📈 Daily Signals":
                     color_discrete_sequence=px.colors.sequential.Tealgrn
                 )
                 fig_pie.update_layout(template="plotly_dark", showlegend=False)
-                st.plotly_chart(fig_pie, width="stretch") # <-- CORRECTION ICI
+                st.plotly_chart(fig_pie, width="stretch")
                 
                 st.success(f"**Total Invested:** {active_signals['Invest (€)'].sum():.2f} €")
                 st.caption(f"Remaining Cash: {capital - active_signals['Invest (€)'].sum():.2f} €")
@@ -406,7 +416,7 @@ elif page == "⚙️ Model Details":
         color_discrete_map={'0 - Defensive 🛡️': '#95a5a6', '1 - Value 💰': '#3498db', '2 - Growth 📈': '#f1c40f', '3 - Momentum 🚀': '#2ecc71'}
     )
     fig_box.update_layout(template="plotly_dark", showlegend=False, height=450)
-    st.plotly_chart(fig_box, width="stretch") # <-- CORRECTION ICI
+    st.plotly_chart(fig_box, width="stretch")
 
 # -----------------------------------------------------------------------------
 # DISCLAIMER (Sidebar)
