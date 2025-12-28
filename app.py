@@ -17,7 +17,7 @@ import pytz
 # -----------------------------------------------------------------------------
 st.set_page_config(
     page_title="AlphaEdge | CAC40 Smart Portfolio",
-    page_icon="📊",
+    page_icon="favicon.jpg", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
