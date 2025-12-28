@@ -97,7 +97,7 @@ else:
 # 3. SIDEBAR
 # -----------------------------------------------------------------------------
 # Logo Display
-st.sidebar.image("favicon.jpg", width=100) 
+st.sidebar.image("https://cdn-icons-png.flaticon.com/512/2621/2621020.png", width=80)
 
 st.sidebar.title("")
 st.sidebar.markdown("**CAC40 Quantitative Optimizer**")
