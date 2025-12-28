@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
+import yfinance as yf  # Library for Live Prices
 from datetime import datetime
 import pytz
 
@@ -16,8 +17,8 @@ import pytz
 # 1. PAGE CONFIGURATION
 # -----------------------------------------------------------------------------
 st.set_page_config(
-    page_title="AlphaEdge | CAC40 Smart Portfolio",
-    page_icon="favicon.png", 
+    page_title=" CAC40 Smart Portfolio",
+    page_icon="favicon.jpg", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -95,13 +96,14 @@ else:
 # -----------------------------------------------------------------------------
 # 3. SIDEBAR
 # -----------------------------------------------------------------------------
-# Affichage du Logo (Ajustez width selon la taille voulue)
-st.sidebar.image("favicon.png", width=100) 
+# Logo Display
+st.sidebar.image("favicon.jpg", width=100) 
 
-st.sidebar.title("AlphaEdge")
+st.sidebar.title("")
 st.sidebar.markdown("**CAC40 Quantitative Optimizer**")
 st.sidebar.caption("*Powered by XGBoost + K-Means + Markowitz*")
 
+# GitHub Badge
 st.sidebar.markdown(
     """
     <div style='text-align: center; padding: 10px 0;'>
@@ -112,9 +114,11 @@ st.sidebar.markdown(
     """,
     unsafe_allow_html=True
 )
-st.sidebar.markdown("---"),
 
-# Navigation in English
+# Separator (Corrected: No st.help wrapper)
+st.sidebar.markdown("---")
+
+# Navigation
 page = st.sidebar.radio("Navigation", ["🏠 Dashboard & Performance", "🚀 Daily Signals", "⚙️ Model Details"])
 
 st.sidebar.markdown("---")
@@ -197,18 +201,51 @@ elif page == "🚀 Daily Signals":
         col1, col2 = st.columns([2, 1])
         
         with col1:
-            st.subheader("📋 Watchlist (Cluster 3)")
+            st.subheader(" Investment Watchlist ")
             
-            # Note: We keep looking for 'ACHAT' because your CSV data might still be in French
-            # If you change daily_run.py to output 'BUY', change this line to: if val == 'BUY':
+            # Fetch Live Prices
+            with st.spinner('Fetching live prices from Yahoo Finance...'):
+                try:
+                    tickers_list = latest_signals['Ticker'].tolist()
+                    if tickers_list:
+                        live_data = yf.download(tickers_list, period="1d", progress=False)['Close']
+                        
+                        # Handle Data Structure (Series vs DataFrame)
+                        if isinstance(live_data, pd.Series):
+                             current_prices = {tickers_list[0]: live_data.iloc[-1]}
+                        elif not live_data.empty:
+                            current_prices = live_data.iloc[-1].to_dict()
+                        else:
+                            current_prices = {}
+                        
+                        latest_signals['Last Price'] = latest_signals['Ticker'].map(current_prices)
+                    else:
+                        latest_signals['Last Price'] = 0.0
+                except Exception as e:
+                    st.warning(f"⚠️ Could not fetch live prices: {e}")
+                    latest_signals['Last Price'] = 0.0
+
+            # --- REORDER COLUMNS HERE ---
+            # On force l'ordre des colonnes ici
+            desired_order = ['Ticker', 'Last Price', 'Proba_Hausse', 'Cluster', 'Signal', 'Allocation']
+            # On filtre pour ne garder que les colonnes qui existent vraiment (sécurité)
+            final_cols = [c for c in desired_order if c in latest_signals.columns]
+            latest_signals = latest_signals[final_cols]
+
+            # Formatting Function
             def highlight_signal(val):
                 if val == 'ACHAT' or val == 'BUY': return 'color: #2ecc71; font-weight: bold'
                 if val == 'VENTE' or val == 'SELL': return 'color: #e74c3c; font-weight: bold'
                 return 'color: #95a5a6'
 
+            # Display Table
             st.dataframe(
                 latest_signals.style.map(highlight_signal, subset=['Signal'])
-                .format({'Proba_Hausse': '{:.1%}', 'Allocation': '{:.1%}'})
+                .format({
+                    'Last Price': '{:.2f} €',
+                    'Proba_Hausse': '{:.1%}', 
+                    'Allocation': '{:.1%}'
+                }, na_rep="-")
                 .background_gradient(subset=['Proba_Hausse'], cmap='Greens'),
                 use_container_width=True,
                 height=500
@@ -216,17 +253,22 @@ elif page == "🚀 Daily Signals":
             
         with col2:
             st.subheader("🍰 Current Allocation")
-            portfolio_active = latest_signals[latest_signals['Allocation'] > 0]
-            
-            if not portfolio_active.empty:
-                fig_pie = px.pie(
-                    portfolio_active, values='Allocation', names='Ticker',
-                    hole=0.4, color_discrete_sequence=px.colors.sequential.RdBu
-                )
-                fig_pie.update_layout(template="plotly_dark", showlegend=False)
-                st.plotly_chart(fig_pie, use_container_width=True)
+            # On vérifie que la colonne Allocation existe bien avant de filtrer
+            if 'Allocation' in latest_signals.columns:
+                portfolio_active = latest_signals[latest_signals['Allocation'] > 0]
+                
+                if not portfolio_active.empty:
+                    fig_pie = px.pie(
+                        portfolio_active, values='Allocation', names='Ticker',
+                        hole=0.4, color_discrete_sequence=px.colors.sequential.RdBu
+                    )
+                    fig_pie.update_layout(template="plotly_dark", showlegend=False)
+                    st.plotly_chart(fig_pie, use_container_width=True)
+                else:
+                    st.info("😴 Portfolio is currently 100% Cash.")
             else:
-                st.info("😴 Portfolio is currently 100% Cash.")
+                st.error("Column 'Allocation' not found in data.")
+
 
 # -----------------------------------------------------------------------------
 # PAGE 3: DETAILS
@@ -235,7 +277,7 @@ elif page == "⚙️ Model Details":
     st.title("⚙️ Model Architecture")
     
     st.markdown("""
-    ###  "Hybrid" Approach
+    ### 🧠 "Hybrid" Approach
     This model combines Machine Learning and Quantitative Finance:
     """)
     
