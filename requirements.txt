@@ -20,7 +20,7 @@ seaborn>=0.13.0
 plotly>=5.18.0
 
 # Technical indicators
-pandas-ta>=0.3.14
+pandas-ta
 
 # Utilities
 jupyter>=1.0.0
