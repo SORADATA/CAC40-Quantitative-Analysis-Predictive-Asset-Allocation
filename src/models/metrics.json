@@ -1,0 +1,12 @@
+{
+    "accuracy": 0.5577156743620899,
+    "auc_score": 0.5885898936862146,
+    "best_params": {
+        "colsample_bytree": 0.8,
+        "learning_rate": 0.01,
+        "max_depth": 3,
+        "n_estimators": 200,
+        "subsample": 0.8
+    },
+    "training_date": "28/12/2025"
+}
