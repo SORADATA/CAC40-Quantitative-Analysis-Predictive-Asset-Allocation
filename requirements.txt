@@ -19,9 +19,7 @@ matplotlib>=3.8.2
 seaborn>=0.13.0
 plotly>=5.18.0
 
-# Technical indicators
 
-git+https://github.com/twopirllc/pandas-ta.git
 
 # Utilities
 jupyter>=1.0.0
