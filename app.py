@@ -57,7 +57,6 @@ def load_data():
         history_df.index.name = 'Date'
         history_df = history_df.sort_index()
     except Exception as e:
-        # Silent error fallback
         history_df = pd.DataFrame(columns=['Strategy', 'Benchmark'])
 
     # B. Latest Signals
@@ -117,7 +116,7 @@ st.sidebar.markdown(
 st.sidebar.markdown("---")
 
 # Navigation
-page = st.sidebar.radio("Navigation", ["🏠 Dashboard & Performance", "🚀 Daily Signals", "⚙️ Model Details"])
+page = st.sidebar.radio("Navigation", [" Dashboard & Performance", " 📈 Daily Signals", "⚙️ Model Details"])
 
 st.sidebar.markdown("---")
 st.sidebar.success("✅ **System Status**: ONLINE")
@@ -126,8 +125,8 @@ st.sidebar.info(f"📅 **Data Date**: {datetime.now().strftime('%d/%m/%Y')}")
 # -----------------------------------------------------------------------------
 # PAGE 1: DASHBOARD
 # -----------------------------------------------------------------------------
-if page == "🏠 Dashboard & Performance":
-    st.title("📊 Live Performance")
+if page == " Dashboard & Performance":
+    st.title(" Live Performance")
     
     if history_df.empty or len(history_df) < 2:
         st.info("👋 Welcome! System initialized. History will appear after the next daily update.")
@@ -163,8 +162,9 @@ if page == "🏠 Dashboard & Performance":
             line=dict(width=0), showlegend=False
         ))
 
+        # Correction : on remplace use_container_width=True par le comportement par défaut ou width='stretch' si supporté
         fig_perf.update_layout(template="plotly_dark", height=500, legend=dict(orientation="h", y=1.02))
-        st.plotly_chart(fig_perf, use_container_width=True)
+        st.plotly_chart(fig_perf, width="stretch")  # <-- CORRECTION ICI (si supporté) ou use_container_width=True supprimé
 
         col_dd, col_dist = st.columns(2)
         with col_dd:
@@ -177,19 +177,19 @@ if page == "🏠 Dashboard & Performance":
                     line=dict(color='#E74C3C', width=1), name='Drawdown'
                 ))
                 fig_dd.update_layout(template="plotly_dark", height=350)
-                st.plotly_chart(fig_dd, use_container_width=True)
+                st.plotly_chart(fig_dd, width="stretch") # <-- CORRECTION ICI
 
         with col_dist:
             st.subheader("📊 Return Distribution")
             if not daily_ret.empty:
                 fig_hist = px.histogram(daily_ret.dropna(), nbins=50, color_discrete_sequence=['#4ECDC4'])
                 fig_hist.update_layout(template="plotly_dark", height=350, showlegend=False)
-                st.plotly_chart(fig_hist, use_container_width=True)
+                st.plotly_chart(fig_hist, width="stretch") # <-- CORRECTION ICI
 
 # -----------------------------------------------------------------------------
-# PAGE 2: SIGNALS (AVEC CALCULATEUR CAPITAL)
+# PAGE 2: SIGNALS (CORRIGÉ & NETTOYÉ)
 # -----------------------------------------------------------------------------
-elif page == "🚀 Daily Signals":
+elif page == "📈 Daily Signals":
     st.title("🤖 ML Investment Signals")
     st.markdown("Signals generated at **18:00 UTC** via GitHub Actions.")
     
@@ -212,7 +212,6 @@ elif page == "🚀 Daily Signals":
             st.markdown("---")
 
             # --- FILTERING LOGIC ---
-            # We ONLY want stocks with Allocation > 0 OR Strong Buy signals
             if 'Allocation' in latest_signals.columns:
                 active_signals = latest_signals[latest_signals['Allocation'] > 0.001].copy()
             else:
@@ -263,11 +262,11 @@ elif page == "🚀 Daily Signals":
                 # Custom Color Function (Dark Green > 70%)
                 def color_proba(val):
                     if val >= 0.70: 
-                        return 'background-color: #145A32; color: white; font-weight: bold;' # Dark Green
+                        return 'background-color: #145A32; color: white; font-weight: bold;' # Vert Foncé
                     elif val >= 0.60: 
-                        return 'background-color: #28B463; color: white;' # Medium Green
+                        return 'background-color: #28B463; color: white;' # Vert Moyen
                     else: 
-                        return 'background-color: #D5F5E3; color: black;' # Light Green
+                        return 'background-color: #D5F5E3; color: black;' # Vert Clair
 
                 # Style Config
                 st.dataframe(
@@ -282,7 +281,7 @@ elif page == "🚀 Daily Signals":
                     .map(color_proba, subset=['Proba_Hausse'])
                     .background_gradient(subset=['Invest (€)'], cmap='BuGn'),
                     
-                    use_container_width=True,
+                    width="stretch",  # <-- CORRECTION ICI : Remplacement de use_container_width=True
                     height=400,
                     column_config={
                         "Allocation": st.column_config.NumberColumn(
@@ -291,29 +290,29 @@ elif page == "🚀 Daily Signals":
                             format="%.1f %%"
                         ),
                         "Proba_Hausse": st.column_config.NumberColumn(
-                            "ML Confidence",
+                            "AI Confidence",
                             help="🧠 Probability of upside (XGBoost).",
                             format="%.1f %%"
                         ),
                         "Shares (Qté)": st.column_config.NumberColumn(
                             "Shares (Qty)",
-                            help="📦 Number of full shares to buy (rounded down)."
+                            help="📦 Number of full shares to buy. If 0, increase capital."
                         )
                     }
                 )
             
         with col2:
-            st.subheader(" Strategic Allocation")
+            st.subheader(" Asset Allocation")
             if not active_signals.empty and 'Allocation' in active_signals.columns:
                 fig_pie = px.pie(
                     active_signals, 
                     values='Allocation', 
                     names='Ticker',
-                    hole=0.4, 
-                    color_discrete_sequence=px.colors.sequential.RdBu
+                    hole=0.4,
+                    color_discrete_sequence=px.colors.sequential.Tealgrn
                 )
                 fig_pie.update_layout(template="plotly_dark", showlegend=False)
-                st.plotly_chart(fig_pie, use_container_width=True)
+                st.plotly_chart(fig_pie, width="stretch") # <-- CORRECTION ICI
                 
                 st.success(f"**Total Invested:** {active_signals['Invest (€)'].sum():.2f} €")
                 st.caption(f"Remaining Cash: {capital - active_signals['Invest (€)'].sum():.2f} €")
@@ -407,7 +406,7 @@ elif page == "⚙️ Model Details":
         color_discrete_map={'0 - Defensive 🛡️': '#95a5a6', '1 - Value 💰': '#3498db', '2 - Growth 📈': '#f1c40f', '3 - Momentum 🚀': '#2ecc71'}
     )
     fig_box.update_layout(template="plotly_dark", showlegend=False, height=450)
-    st.plotly_chart(fig_box, use_container_width=True)
+    st.plotly_chart(fig_box, width="stretch") # <-- CORRECTION ICI
 
 # -----------------------------------------------------------------------------
 # DISCLAIMER (Sidebar)
