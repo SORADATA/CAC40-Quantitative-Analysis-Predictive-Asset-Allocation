@@ -252,7 +252,7 @@ elif page == "🚀 Daily Signals":
             )
             
         with col2:
-            st.subheader("🍰 Current Allocation")
+            st.subheader(" Current Allocation")
             # On vérifie que la colonne Allocation existe bien avant de filtrer
             if 'Allocation' in latest_signals.columns:
                 portfolio_active = latest_signals[latest_signals['Allocation'] > 0]
