@@ -1,44 +1,97 @@
-name: Daily Portfolio Update
+name:  Daily Portfolio Analytics
 
-# 1. QUAND ? (Déclencheur)
 on:
   schedule:
-    - cron: '0 8 * * *'  # Tous les jours à 8h00 UTC
-  workflow_dispatch:      # Permet de lancer manuellement pour tester
+    # Lundi-Vendredi à 17:00 UTC (18:00 CET / 19:00 CEST)
+    - cron: '0 17 * * 1-5'
+  
+  workflow_dispatch:  # Bouton manuel
 
 permissions:
-  contents: write         # Donne le droit au robot d'écrire dans le repo
+  contents: write
+  actions: read
 
-# 2. QUOI ? (Les étapes)
 jobs:
-  build:
-    runs-on: ubuntu-latest # L'ordi virtuel gratuit de GitHub
-
+  portfolio-optimization:
+    name: Run ML Pipeline & Update Portfolio
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
     steps:
-      # A. Récupérer ton code
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # B. Installer Python
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      # ══════════════════════════════════════════════════════
+      # 1. Setup Environment
+      # ══════════════════════════════════════════════════════
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
         with:
-          python-version: '3.9'
-
-      # C. Installer les librairies (pandas, yfinance...)
-      - name: Install dependencies
+          fetch-depth: 0
+      
+      # TRES BIEN D'AVOIR CHOISI 3.11 (Évite les bugs de 3.13 avec Pandas)
+      - name: 🐍 Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: 📦 Install dependencies
         run: |
+          python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
-
-      # D. LANCER TON SCRIPT IA (Le "Coureur")
-      - name: Run AI Prediction & Optimization
-        run: python daily_run.py
-
-      # E. SAUVEGARDER LE CSV (Commit & Push)
-      - name: Commit and Push changes
+      
+      
+      # ══════════════════════════════════════════════════════
+      # 2. Run Analytics Pipeline
+      # ══════════════════════════════════════════════════════
+      - name: Execute Portfolio Optimization
         run: |
-          git config --global user.name 'GitHub Action Bot'
-          git config --global user.email 'action@github.com'
-          git add portfolio_history.csv
-          git commit -m "🤖 Mise à jour automatique du portefeuille" || echo "Rien à changer"
-          git push
+          echo "🚀 Starting portfolio analytics pipeline..."
+          python daily_run.py
+          echo "✅ Pipeline completed successfully"
+        env:
+          PYTHONUNBUFFERED: 1
+          TZ: Europe/Paris
+      
+      
+      # ══════════════════════════════════════════════════════
+      # 3. Save Results
+      # ══════════════════════════════════════════════════════
+      - name: 💾 Commit updated data
+        run: |
+          # Configure Git
+          git config --local user.name 'AlphaML Bot'
+          git config --local user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          
+          # CORRECTION ICI : On ajoute les fichiers spécifiques générés par daily_run.py
+          git add latest_signals.csv portfolio_history.csv
+          
+          # Commit if changes exist
+          if ! git diff --staged --quiet; then
+            TIMESTAMP=$(date +'%Y-%m-%d %H:%M UTC')
+            git commit -m "chore(data): daily portfolio update ${TIMESTAMP}"
+            
+            git push
+            echo "✅ Data committed and pushed"
+          else
+            echo "ℹ️ No changes to commit"
+          fi
+      
+      
+      # ══════════════════════════════════════════════════════
+      # 4. Summary (Optional)
+      # ══════════════════════════════════════════════════════
+      - name:  Generate job summary
+        if: always()
+        run: |
+          echo "## 📊 Portfolio Analytics Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Date**: $(date +'%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Run Number**: #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f latest_signals.csv ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 📈 Latest Signals (Top 5)" >> $GITHUB_STEP_SUMMARY
+            echo '```csv' >> $GITHUB_STEP_SUMMARY
+            head -n 6 latest_signals.csv >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
