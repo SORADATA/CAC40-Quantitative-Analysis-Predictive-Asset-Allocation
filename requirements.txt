@@ -19,7 +19,8 @@ matplotlib>=3.8.2
 seaborn>=0.13.0
 plotly>=5.18.0
 
-
+# Technical indicators
+ta>=0.11.0
 
 # Utilities
 jupyter>=1.0.0
