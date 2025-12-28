@@ -6,7 +6,9 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 import yfinance as yf
-import pandas_ta as ta
+from ta.momentum import RSIIndicator
+from ta.volatility import BollingerBands, AverageTrueRange
+from ta.trend import MACD
 import pandas_datareader.data as web
 import statsmodels.api as sm
 from statsmodels.regression.rolling import RollingOLS
@@ -63,48 +65,54 @@ def compute_technical_indicators(df):
     # 1. Garman Klass Volatility
     df['garman_klass_vol'] = ((np.log(df['high'])-np.log(df['low']))**2)/2-(2*np.log(2)-1)*((np.log(df['adj close'])-np.log(df['open']))**2)
 
-    # 2. RSI
-    df['rsi'] = df.groupby(level=1)['adj close'].transform(lambda x: ta.rsi(close=x, length=20))
+    # 2. RSI avec ta
+    for ticker in df.index.get_level_values(1).unique():
+        idx = (slice(None), ticker)
+        close_series = df.loc[idx, 'adj close']
+        if len(close_series) > 20:
+            rsi_indicator = RSIIndicator(close=close_series, window=20)
+            df.loc[idx, 'rsi'] = rsi_indicator.rsi()
 
-    # 3. Bollinger Bands (Low, Mid, High)
-    # Note : pandas_ta renvoie un DF, on extrait les colonnes
-    def get_bb(x):
-        try:
-            return ta.bbands(close=np.log1p(x), length=20)
-        except:
-            return pd.DataFrame(np.nan, index=x.index, columns=['BBL_20_2.0', 'BBM_20_2.0', 'BBU_20_2.0'])
-
-    # Optimisation : On ne peut pas facilement transform un DataFrame avec 3 colonnes. 
-    # On itère ou on applique différemment. Ici on simplifie pour la robustesse daily.
-    # Pour Daily Run rapide, on fait une boucle (plus sûr que groupby transform complexe ici)
+    # 3. Bollinger Bands avec ta
     for ticker in df.index.get_level_values(1).unique():
         idx = (slice(None), ticker)
         close_series = np.log1p(df.loc[idx, 'adj close'])
         if len(close_series) > 20:
-            bb = ta.bbands(close=close_series, length=20)
-            if bb is not None:
-                df.loc[idx, 'bb_low'] = bb.iloc[:, 0].values
-                df.loc[idx, 'bb_mid'] = bb.iloc[:, 1].values
-                df.loc[idx, 'bb_high'] = bb.iloc[:, 2].values
+            bb = BollingerBands(close=close_series, window=20, window_dev=2)
+            df.loc[idx, 'bb_low'] = bb.bollinger_lband()
+            df.loc[idx, 'bb_mid'] = bb.bollinger_mavg()
+            df.loc[idx, 'bb_high'] = bb.bollinger_hband()
 
-    # 4. ATR
+    # 4. ATR avec ta
     def compute_atr(stock_data):
-        if len(stock_data) < 15: return pd.Series(np.nan, index=stock_data.index)
-        atr = ta.atr(high=stock_data['high'], low=stock_data['low'], close=stock_data['close'], length=14)
+        if len(stock_data) < 15: 
+            return pd.Series(np.nan, index=stock_data.index)
+        atr_indicator = AverageTrueRange(
+            high=stock_data['high'], 
+            low=stock_data['low'], 
+            close=stock_data['close'], 
+            window=14
+        )
+        atr = atr_indicator.average_true_range()
         return atr.sub(atr.mean()).div(atr.std())
 
     df['atr'] = df.groupby(level=1, group_keys=False).apply(compute_atr)
 
-    # 5. MACD
-    def compute_macd(close):
-        if len(close) < 26: return pd.Series(np.nan, index=close.index)
-        macd = ta.macd(close=close, length=20)
-        if macd is not None:
-            macd_val = macd.iloc[:,0]
-            return macd_val.sub(macd_val.mean()).div(macd_val.std())
-        return pd.Series(np.nan, index=close.index)
+    # 5. MACD avec ta
+    def compute_macd(stock_data):
+        if len(stock_data) < 26: 
+            return pd.Series(np.nan, index=stock_data.index)
+        close_series = stock_data['adj close']
+        macd_indicator = MACD(
+            close=close_series, 
+            window_slow=26, 
+            window_fast=12, 
+            window_sign=9
+        )
+        macd_val = macd_indicator.macd()
+        return macd_val.sub(macd_val.mean()).div(macd_val.std())
 
-    df['macd'] = df.groupby(level=1, group_keys=False)['adj close'].apply(compute_macd)
+    df['macd'] = df.groupby(level=1, group_keys=False).apply(compute_macd)
 
     # 6. Euro Volume
     df['euro_volume'] = (df['adj close']*df['volume'])/1e6
