@@ -28,7 +28,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         pip install -r requirements.txt
-        pip install pandas-ta
+        
 
         
     - name: Lint with flake8
