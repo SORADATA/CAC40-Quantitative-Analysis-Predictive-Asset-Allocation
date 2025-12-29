@@ -52,29 +52,27 @@ jobs:
           TZ: Europe/Paris
       
       
-      # ══════════════════════════════════════════════════════
-      # 3. Save Results
-      # ══════════════════════════════════════════════════════
+      # 3. Save Results (Version Robuste)
       - name: 💾 Commit updated data
         run: |
-          # Configure Git
           git config --local user.name 'AlphaML Bot'
           git config --local user.email '41898282+github-actions[bot]@users.noreply.github.com'
           
-          # 1. On ajoute TOUS les fichiers (y compris le debug) en une seule fois
-          # Note: Si debug_run.txt n'existe pas, git add ne plantera pas fatalement si les autres existent.
           git add latest_signals.csv portfolio_history.csv debug_run.txt
           
-          # Commit if changes exist
           if ! git diff --staged --quiet; then
             TIMESTAMP=$(date +'%Y-%m-%d %H:%M UTC')
             git commit -m "chore(data): daily portfolio update ${TIMESTAMP}"
             
-            # --- SECURITÉ CRUCIALE ---
-            # On récupère les dernières modifs du site avant de pousser pour éviter le rejet
-            git pull --rebase origin main
+            # BOUCLE DE SECURITÉ : Essaie 3 fois de Pull/Rebase/Push
+            n=0
+            until [ "$n" -ge 3 ]
+            do
+               git pull --rebase origin main && git push && break
+               n=$((n+1))
+               sleep 10
+            done
             
-            git push
             echo "✅ Data committed and pushed"
           else
             echo "ℹ️ No changes to commit"
