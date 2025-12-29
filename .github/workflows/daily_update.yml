@@ -1,4 +1,4 @@
-name:  Daily Portfolio Analytics
+name: Daily Portfolio Analytics
 
 on:
   schedule:
@@ -26,7 +26,6 @@ jobs:
         with:
           fetch-depth: 0
       
-      # TRES BIEN D'AVOIR CHOISI 3.11 (Évite les bugs de 3.13 avec Pandas)
       - name: 🐍 Setup Python 3.11
         uses: actions/setup-python@v5
         with:
@@ -42,7 +41,7 @@ jobs:
       # ══════════════════════════════════════════════════════
       # 2. Run Analytics Pipeline
       # ══════════════════════════════════════════════════════
-      - name: Execute Portfolio Optimization
+      - name: 🚀 Execute Portfolio Optimization
         run: |
           echo "🚀 Starting portfolio analytics pipeline..."
           python daily_run.py
@@ -52,36 +51,65 @@ jobs:
           TZ: Europe/Paris
       
       
-      # 3. Save Results (Version Robuste)
+      # ══════════════════════════════════════════════════════
+      # 3. Verify Generated Files
+      # ══════════════════════════════════════════════════════
+      - name: 🔍 Check generated files
+        run: |
+          echo "📂 Checking generated files..."
+          ls -lh latest_signals.csv portfolio_history.csv data_metadata.json || echo "Some files missing"
+          ls -lh data/raw/*.parquet || echo "Data files missing"
+          
+          # Show file sizes
+          if [ -f data/raw/cac40_daily_raw.parquet ]; then
+            echo "✓ Daily data: $(du -h data/raw/cac40_daily_raw.parquet | cut -f1)"
+          fi
+          if [ -f data/raw/cac40_monthly_features.parquet ]; then
+            echo "✓ Monthly data: $(du -h data/raw/cac40_monthly_features.parquet | cut -f1)"
+          fi
+      
+      
+      # ══════════════════════════════════════════════════════
+      # 4. Commit & Push Results (VERSION ROBUSTE)
+      # ══════════════════════════════════════════════════════
       - name: 💾 Commit updated data
         run: |
           git config --local user.name 'AlphaML Bot'
           git config --local user.email '41898282+github-actions[bot]@users.noreply.github.com'
           
-          git add latest_signals.csv portfolio_history.csv debug_run.txt
+          # Add ALL generated files (signals, history, data, metadata)
+          git add -f latest_signals.csv portfolio_history.csv data_metadata.json debug_run.txt
+          git add -f data/raw/*.parquet || echo "No parquet files to add"
           
           if ! git diff --staged --quiet; then
             TIMESTAMP=$(date +'%Y-%m-%d %H:%M UTC')
             git commit -m "chore(data): daily portfolio update ${TIMESTAMP}"
             
-            # BOUCLE DE SECURITÉ : Essaie 3 fois de Pull/Rebase/Push
+            # BOUCLE DE SÉCURITÉ : 3 tentatives avec pull/rebase
             n=0
             until [ "$n" -ge 3 ]
             do
                git pull --rebase origin main && git push && break
                n=$((n+1))
+               echo "⚠️ Push failed, retrying ($n/3)..."
                sleep 10
             done
             
-            echo "✅ Data committed and pushed"
+            if [ "$n" -ge 3 ]; then
+              echo "❌ Failed to push after 3 attempts"
+              exit 1
+            fi
+            
+            echo "✅ Data committed and pushed successfully"
           else
             echo "ℹ️ No changes to commit"
           fi
       
+      
       # ══════════════════════════════════════════════════════
-      # 4. Summary (Optional)
+      # 5. Job Summary (Enhanced)
       # ══════════════════════════════════════════════════════
-      - name:  Generate job summary
+      - name: 📊 Generate job summary
         if: always()
         run: |
           echo "## 📊 Portfolio Analytics Summary" >> $GITHUB_STEP_SUMMARY
@@ -89,9 +117,19 @@ jobs:
           echo "- **Date**: $(date +'%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
           echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Run Number**: #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           
-          if [ -f latest_signals.csv ]; then
+          # Show metadata if available
+          if [ -f data_metadata.json ]; then
+            echo "### 📁 Data Files Generated" >> $GITHUB_STEP_SUMMARY
+            echo '```json' >> $GITHUB_STEP_SUMMARY
+            cat data_metadata.json >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Show latest signals
+          if [ -f latest_signals.csv ]; then
             echo "### 📈 Latest Signals (Top 5)" >> $GITHUB_STEP_SUMMARY
             echo '```csv' >> $GITHUB_STEP_SUMMARY
             head -n 6 latest_signals.csv >> $GITHUB_STEP_SUMMARY

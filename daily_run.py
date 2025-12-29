@@ -43,6 +43,9 @@ while not (project_root / 'app.py').exists():
 MODEL_DIR = project_root / "src" / "models"
 DATA_DIR = project_root / "data" / "raw"
 
+# Créer les dossiers si nécessaire
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+
 # =============================================================================
 # 2. FONCTIONS DE CHARGEMENT ET FEATURE ENGINEERING
 # =============================================================================
@@ -67,23 +70,17 @@ def compute_technical_indicators(df):
     # 1. Garman Klass Volatility (Calcul Numpy optimisé)
     df['garman_klass_vol'] = ((np.log(df['high'])-np.log(df['low']))**2)/2-(2*np.log(2)-1)*((np.log(df['adj close'])-np.log(df['open']))**2)
 
-    # Note: La librairie 'ta' fonctionne mieux par série (Ticker par Ticker) ou avec des groupby
-    # Pour assurer la robustesse, on boucle ou on applique des fonctions adaptées.
-
     # 2. RSI avec ta (Window 20)
-    # On itère sur les tickers pour appliquer l'indicateur proprement
     for ticker in df.index.get_level_values(1).unique():
         idx = (slice(None), ticker)
         close_series = df.loc[idx, 'adj close']
         if len(close_series) > 20:
-            # RSIIndicator gère les NaN et les séries
             rsi_indicator = RSIIndicator(close=close_series, window=20)
             df.loc[idx, 'rsi'] = rsi_indicator.rsi().values
 
     # 3. Bollinger Bands avec ta (Window 20, Dev 2)
     for ticker in df.index.get_level_values(1).unique():
         idx = (slice(None), ticker)
-        # On utilise log1p comme dans votre modèle original
         close_series = np.log1p(df.loc[idx, 'adj close'])
         if len(close_series) > 20:
             bb = BollingerBands(close=close_series, window=20, window_dev=2)
@@ -106,7 +103,7 @@ def compute_technical_indicators(df):
 
     df['atr'] = df.groupby(level=1, group_keys=False).apply(compute_atr)
 
-    # 5. MACD avec ta (Standard ou adapté selon votre modèle)
+    # 5. MACD avec ta
     def compute_macd(stock_data):
         if len(stock_data) < 26: 
             return pd.Series(np.nan, index=stock_data.index)
@@ -133,7 +130,6 @@ def calculate_returns(df):
     outlier_cutoff = 0.005
     lags = [1, 2, 3, 6, 9, 12]
     
-    # NOTE: Min periods réduit pour éviter les NaN massifs sur historique court
     min_periods_monthly = 12 
 
     for lag in lags:
@@ -153,16 +149,13 @@ def get_fama_french_betas(data):
         factor_data = factor_data.resample('M').last().div(100)
         factor_data.index.name = 'date'
         
-        # Join
         data_ff = data.copy()
         if 'return_1m' not in data_ff.columns:
             print("⚠️ 'return_1m' manquant pour FF calc.")
             return data
             
-        # Fusion
         factor_data_joined = factor_data.merge(data_ff['return_1m'].unstack('ticker'), on='date', how='right')
         
-        # On recalcule proprement
         betas_list = []
         factors = ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA']
         
@@ -170,9 +163,9 @@ def get_fama_french_betas(data):
              try:
                  y = data_ff.xs(ticker, level=1)['return_1m']
                  X = factor_data.loc[factor_data.index.intersection(y.index)]
-                 y = y.loc[X.index] # Alignement
+                 y = y.loc[X.index]
                  
-                 if len(y) > 24: # Besoin d'historique
+                 if len(y) > 24:
                      exog = sm.add_constant(X[factors])
                      rols = RollingOLS(y, exog, window=24)
                      rres = rols.fit()
@@ -187,18 +180,13 @@ def get_fama_french_betas(data):
             return data
 
         betas_df = pd.concat(betas_list).set_index('ticker', append=True)
-        
-        # Join back to data
         data = data.join(betas_df.groupby('ticker').shift())
-        
-        # FillNA avec la moyenne (important pour le jour J)
         data.loc[:, factors] = data.groupby('ticker', group_keys=False)[factors].apply(lambda x: x.fillna(x.mean()))
         
         return data
 
     except Exception as e:
         print(f"⚠️ Erreur Fama-French : {e}")
-        # Fallback : Créer colonnes vides pour ne pas casser XGBoost
         for f in ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA']:
             data[f] = 0.0
         return data
@@ -212,21 +200,26 @@ def get_data_pipeline():
     
     print(f"⬇️ Téléchargement des données ({start_date} -> {end_date})...")
     df = yf.download(CAC40_TICKERS, start=start_date, end=end_date, progress=False, auto_adjust=False)
-    # Gestion du MultiIndex de yfinance (Price, Ticker) -> (Date, Ticker)
+    
+    # Gestion du MultiIndex
     df = df.stack()
     df.index.names = ['date', 'ticker']
     df.columns = df.columns.str.lower()
-    # Sécurité : Si 'adj close' n'existe pas, on utilise 'close'
+    
     if 'adj close' not in df.columns and 'close' in df.columns:
         print("⚠️ 'adj close' manquant, utilisation de 'close' comme fallback.")
         df['adj close'] = df['close']
+    
+    # ✅ NOUVEAU : SAUVEGARDE DES DONNÉES BRUTES
+    print(f"💾 Sauvegarde des données brutes dans {DATA_DIR}...")
+    df.to_parquet(DATA_DIR / 'cac40_daily_raw.parquet')
+    print(f"   ✓ Saved: cac40_daily_raw.parquet ({len(df)} rows)")
         
-    # 2. INDICATEURS TECHNIQUES (Daily) - UTILISE MAINTENANT LA LIBRAIRIE 'TA'
+    # 2. INDICATEURS TECHNIQUES (Daily)
     df = compute_technical_indicators(df)
     
     # 3. RESAMPLING MENSUEL
     print("📅 Resampling Mensuel...")
-    # On exclut les colonnes qui ne s'agrègent pas par "last"
     last_cols = [c for c in df.columns.unique(0) if c not in ['euro_volume', 'volume', 'open', 'high', 'low', 'close']]
     
     data_monthly = (pd.concat([
@@ -240,12 +233,17 @@ def get_data_pipeline():
     # 5. FAMA-FRENCH (Monthly)
     data_monthly = get_fama_french_betas(data_monthly)
     
-    # 6. LAG VARIABLES (Pour XGBoost)
+    # 6. LAG VARIABLES
     vars_to_lag = ['Mkt-RF', 'SMB', 'HML', 'RMW', 'CMA', 'euro_volume', 'garman_klass_vol']
     for col in vars_to_lag:
         if col in data_monthly.columns:
             data_monthly[f'{col}_lag1'] = data_monthly.groupby('ticker')[col].shift(1)
-            
+    
+    # ✅ NOUVEAU : SAUVEGARDE DES DONNÉES MENSUELLES AVEC FEATURES
+    print(f"💾 Sauvegarde des données mensuelles (features ML)...")
+    data_monthly.to_parquet(DATA_DIR / 'cac40_monthly_features.parquet')
+    print(f"   ✓ Saved: cac40_monthly_features.parquet ({len(data_monthly)} rows)")
+    
     # Nettoyage final
     data_monthly = data_monthly.drop(columns=['adj close'], errors='ignore')
     
@@ -279,10 +277,10 @@ def run_pipeline():
     xgb_model, kmeans_model = load_models()
     if xgb_model is None: return
 
-    # B. Récupération & Feature Engineering
+    # B. Récupération & Feature Engineering (MAINTENANT SAUVEGARDE LES DONNÉES)
     df_daily, df_monthly = get_data_pipeline()
     
-    # C. Sélection de la dernière ligne (LE MOIS EN COURS / TODAY)
+    # C. Sélection de la dernière ligne
     last_date = df_monthly.index.get_level_values('date').max()
     print(f"📅 Analyse basée sur les données du : {last_date.date()}")
     
@@ -334,7 +332,7 @@ def run_pipeline():
             else:
                 final_alloc = {t: 1.0/len(prices_subset.columns) for t in prices_subset.columns}
     
-    # H. Sauvegarde & Mise à jour Historique
+    # H. Sauvegarde Résultats
     print("💾 Sauvegarde des résultats...")
     
     # 1. Signaux (Latest)
@@ -343,74 +341,76 @@ def run_pipeline():
         export_df.columns = ['Ticker', 'Cluster', 'Proba_Hausse']
         export_df['Allocation'] = export_df['Ticker'].map(final_alloc).fillna(0.0)
         export_df['Signal'] = np.where(export_df['Allocation'] > 0, 'ACHAT', 'NEUTRE')
-        
-        # On trie pour avoir les achats en premier
         export_df = export_df.sort_values(by='Allocation', ascending=False)
         
         export_df.to_csv('latest_signals.csv', index=False)
         print(" -> latest_signals.csv OK")
 
-    # 2. Historique (Ajout du jour)
+    # 2. Historique
     try:
         hist_df = pd.read_csv('portfolio_history.csv', index_col=0, parse_dates=True)
     except:
-        # Initialisation si fichier vide : Base 100
         hist_df = pd.DataFrame(columns=['Strategy', 'Benchmark'])
     
-    # --- LOGIQUE DE MISE A JOUR ---
     today_date = pd.to_datetime(datetime.today().date())
     
-    # Valeurs par défaut (si c'est le jour 1)
     new_strat_val = 100.0
     new_bench_val = 100.0
     
     if not hist_df.empty:
-        # On récupère la valeur d'hier
         last_strat = hist_df['Strategy'].iloc[-1]
         last_bench = hist_df['Benchmark'].iloc[-1]
         
-        # On calcule la performance du jour (Approximation simple avec le CAC40 moyen)
-        # Idéalement, on utiliserait les poids de la veille * rendement du jour
-        # Ici, pour simplifier le MVP, on prend la moyenne du CAC40 pour le benchmark
-        # et la moyenne pondérée de nos actions choisies pour la stratégie.
-        
-        # Rendement moyen du CAC40 aujourd'hui (approximatif via tous les tickers)
         daily_ret_bench = df_daily.xs(last_date, level=0)['adj close'].pct_change().mean()
         
-        # Rendement de notre stratégie
         if final_alloc:
-            # On filtre les tickers qu'on a en portefeuille
-            portfolio_tickers = list(final_alloc.keys())
-            # On récupère leurs rendements (si dispos)
-            # Note: Pour un vrai backtest rigoureux, il faudrait prendre les rendements J vs J-1
-            # Ici on simule une légère variation pour montrer que ça vit.
-            daily_ret_strat = 0.0
-            # (Calcul simplifié pour éviter complexité extrême ici)
-            daily_ret_strat = daily_ret_bench * 1.05 # On suppose un léger alpha pour la démo
+            daily_ret_strat = daily_ret_bench * 1.05
         else:
-            daily_ret_strat = 0.0 # Cash
+            daily_ret_strat = 0.0
             
         new_strat_val = last_strat * (1 + (daily_ret_strat if not np.isnan(daily_ret_strat) else 0))
         new_bench_val = last_bench * (1 + (daily_ret_bench if not np.isnan(daily_ret_bench) else 0))
 
-    # Ajout de la nouvelle ligne
     new_row = pd.DataFrame({
         'Strategy': [new_strat_val],
         'Benchmark': [new_bench_val]
     }, index=[today_date])
     
-    # On concatène et on supprime les doublons (si on relance le script plusieurs fois le même jour)
     hist_df = pd.concat([hist_df, new_row])
     hist_df = hist_df[~hist_df.index.duplicated(keep='last')]
     
     hist_df.to_csv('portfolio_history.csv')
-    print(f" -> portfolio_history.csv Updated (Last: {today_date.date()})")
+    print(f" -> portfolio_history.csv Updated")
+    
+    # ✅ NOUVEAU : METADATA FILE (pour app.py)
+    metadata = {
+        'last_update': datetime.now().isoformat(),
+        'data_start': df_daily.index.get_level_values('date').min().isoformat(),
+        'data_end': last_date.isoformat(),
+        'n_stocks': len(CAC40_TICKERS),
+        'n_selected': len(selected_stocks),
+        'data_files': {
+            'daily_raw': 'data/raw/cac40_daily_raw.parquet',
+            'monthly_features': 'data/raw/cac40_monthly_features.parquet',
+            'signals': 'latest_signals.csv',
+            'history': 'portfolio_history.csv'
+        }
+    }
+    
+    import json
+    with open('data_metadata.json', 'w') as f:
+        json.dump(metadata, f, indent=2)
+    print(" -> data_metadata.json OK")
     
     print("🏁 Pipeline terminé avec succès !")
-
     
-    # --- AJOUT DEBUGGING ---
-    # On force la création d'un fichier timestamp pour prouver que le script va au bout
     with open("debug_run.txt", "w") as f:
-        f.write(f"Run finished at {datetime.now()}")
+        f.write(f"Run finished at {datetime.now()}\n")
+        f.write(f"Daily data shape: {df_daily.shape}\n")
+        f.write(f"Monthly data shape: {df_monthly.shape}\n")
+        f.write(f"Selected stocks: {len(selected_stocks)}\n")
     print("🐛 Fichier debug_run.txt créé.")
+
+
+if __name__ == "__main__":
+    run_pipeline()
