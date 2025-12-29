@@ -61,20 +61,24 @@ jobs:
           git config --local user.name 'AlphaML Bot'
           git config --local user.email '41898282+github-actions[bot]@users.noreply.github.com'
           
-          # CORRECTION ICI : On ajoute les fichiers spécifiques générés par daily_run.py
-          git add latest_signals.csv portfolio_history.csv
+          # 1. On ajoute TOUS les fichiers (y compris le debug) en une seule fois
+          # Note: Si debug_run.txt n'existe pas, git add ne plantera pas fatalement si les autres existent.
+          git add latest_signals.csv portfolio_history.csv debug_run.txt
           
           # Commit if changes exist
           if ! git diff --staged --quiet; then
             TIMESTAMP=$(date +'%Y-%m-%d %H:%M UTC')
             git commit -m "chore(data): daily portfolio update ${TIMESTAMP}"
             
+            # --- SECURITÉ CRUCIALE ---
+            # On récupère les dernières modifs du site avant de pousser pour éviter le rejet
+            git pull --rebase origin main
+            
             git push
             echo "✅ Data committed and pushed"
           else
             echo "ℹ️ No changes to commit"
           fi
-      
       
       # ══════════════════════════════════════════════════════
       # 4. Summary (Optional)

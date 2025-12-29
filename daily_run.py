@@ -407,3 +407,10 @@ def run_pipeline():
     print(f" -> portfolio_history.csv Updated (Last: {today_date.date()})")
     
     print("🏁 Pipeline terminé avec succès !")
+
+    
+    # --- AJOUT DEBUGGING ---
+    # On force la création d'un fichier timestamp pour prouver que le script va au bout
+    with open("debug_run.txt", "w") as f:
+        f.write(f"Run finished at {datetime.now()}")
+    print("🐛 Fichier debug_run.txt créé.")
