@@ -1,9 +1,15 @@
-Run finished at 2025-12-30 18:28:44.825300
+Run finished at 2025-12-30 19:16:04.752768
 Daily data shape: (100571, 14)
 Monthly data shape: (4673, 26)
 Selected stocks: 10
 Allocations: OrderedDict({'ALO.PA': 0.02, 'BNP.PA': 0.02, 'CA.PA': 0.02, 'CS.PA': 0.02, 'EN.PA': 0.09749, 'ENGI.PA': 0.25, 'ERF.PA': 0.02, 'GLE.PA': 0.25, 'MT.AS': 0.05251, 'ORA.PA': 0.25})
 
 === Latest Values ===
-Strategy: 276.18
-Benchmark: 809.00
+Strategy: 276.19
+Benchmark: 174.64
+
+=== File Paths ===
+Project root: /home/onyxia/work/Gestion-portefeuille
+History file: /home/onyxia/work/Gestion-portefeuille/portfolio_history.csv
+History exists: True
+History size: 62736 bytes
