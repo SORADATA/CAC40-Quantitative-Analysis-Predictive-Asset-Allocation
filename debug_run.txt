@@ -1,13 +1,1 @@
-<<<<<<< Updated upstream
-Run finished at 2025-12-30 18:20:13.137261
-=======
-Run finished at 2025-12-30 18:11:15.019013
-Daily data shape: (100571, 14)
-Monthly data shape: (4673, 26)
-Selected stocks: 10
-Allocations: OrderedDict({'ALO.PA': 0.02, 'BNP.PA': 0.02, 'CA.PA': 0.02, 'CS.PA': 0.02, 'EN.PA': 0.09749, 'ENGI.PA': 0.25, 'ERF.PA': 0.02, 'GLE.PA': 0.25, 'MT.AS': 0.05251, 'ORA.PA': 0.25})
-
-=== Latest Values ===
-Strategy: 128.24
-Benchmark: 104.53
->>>>>>> Stashed changes
+Run finished at 2025-12-30 19:19:57.115692
