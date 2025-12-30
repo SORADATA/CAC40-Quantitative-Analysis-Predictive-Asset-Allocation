@@ -52,54 +52,36 @@ jobs:
       
       
       # ══════════════════════════════════════════════════════
-      # 3. Verify Generated Files
+      # 3. Verify Generated Files (Debugging only)
       # ══════════════════════════════════════════════════════
       - name: 🔍 Check generated files
         run: |
           echo "📂 Checking generated files..."
-          ls -lh latest_signals.csv portfolio_history.csv data_metadata.json || echo "Some files missing"
-          ls -lh data/raw/*.parquet || echo "Data files missing"
-          
-          # Show file sizes
-          if [ -f data/raw/cac40_daily_raw.parquet ]; then
-            echo "✓ Daily data: $(du -h data/raw/cac40_daily_raw.parquet | cut -f1)"
-          fi
-          if [ -f data/raw/cac40_monthly_features.parquet ]; then
-            echo "✓ Monthly data: $(du -h data/raw/cac40_monthly_features.parquet | cut -f1)"
-          fi
+          ls -lh latest_signals.csv portfolio_history.csv data_metadata.json || echo "Some output files missing"
       
       
       # ══════════════════════════════════════════════════════
-      # 4. Commit & Push Results (VERSION ROBUSTE)
+      # 4. Commit & Push Results (FIXED: NO PARQUET / FORCE MERGE)
       # ══════════════════════════════════════════════════════
       - name: 💾 Commit updated data
         run: |
           git config --local user.name 'AlphaML Bot'
           git config --local user.email '41898282+github-actions[bot]@users.noreply.github.com'
           
-          # Add ALL generated files (signals, history, data, metadata)
-          git add -f latest_signals.csv portfolio_history.csv data_metadata.json debug_run.txt
-          git add -f data/raw/*.parquet || echo "No parquet files to add"
+          # 1. Add ONLY result files (We intentionally IGNORE parquet files to avoid conflicts)
+          git add latest_signals.csv portfolio_history.csv data_metadata.json debug_run.txt
           
+          # 2. Check if there are changes to commit
           if ! git diff --staged --quiet; then
             TIMESTAMP=$(date +'%Y-%m-%d %H:%M UTC')
             git commit -m "chore(data): daily portfolio update ${TIMESTAMP}"
             
-            # BOUCLE DE SÉCURITÉ : 3 tentatives avec pull/rebase
-            n=0
-            until [ "$n" -ge 3 ]
-            do
-               git pull --rebase origin main && git push && break
-               n=$((n+1))
-               echo "⚠️ Push failed, retrying ($n/3)..."
-               sleep 10
-            done
+            # 3. CRUCIAL FIX: Pull with rebase strategy "Theirs"
+            # This forces the bot's version to win if there is a conflict on the CSVs
+            git pull --rebase -Xtheirs origin main
             
-            if [ "$n" -ge 3 ]; then
-              echo "❌ Failed to push after 3 attempts"
-              exit 1
-            fi
-            
+            # 4. Push
+            git push origin main
             echo "✅ Data committed and pushed successfully"
           else
             echo "ℹ️ No changes to commit"
@@ -107,7 +89,7 @@ jobs:
       
       
       # ══════════════════════════════════════════════════════
-      # 5. Job Summary (Enhanced)
+      # 5. Job Summary
       # ══════════════════════════════════════════════════════
       - name: 📊 Generate job summary
         if: always()
@@ -119,16 +101,6 @@ jobs:
           echo "- **Run Number**: #${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          # Show metadata if available
-          if [ -f data_metadata.json ]; then
-            echo "### 📁 Data Files Generated" >> $GITHUB_STEP_SUMMARY
-            echo '```json' >> $GITHUB_STEP_SUMMARY
-            cat data_metadata.json >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-          fi
-          
-          # Show latest signals
           if [ -f latest_signals.csv ]; then
             echo "### 📈 Latest Signals (Top 5)" >> $GITHUB_STEP_SUMMARY
             echo '```csv' >> $GITHUB_STEP_SUMMARY
