@@ -1,25 +1,13 @@
 {
-  "last_update": "2025-12-30T19:16:04.750185",
+  "last_update": "2025-12-30T20:22:50.984897",
   "data_start": "2015-12-30T00:00:00",
-  "data_end": "2025-12-30T00:00:00",
+  "data_end": "2025-12-29T00:00:00",
   "n_stocks": 40,
-  "n_selected": 10,
-  "allocations": {
-    "ALO.PA": 0.02,
-    "BNP.PA": 0.02,
-    "CA.PA": 0.02,
-    "CS.PA": 0.02,
-    "EN.PA": 0.09749,
-    "ENGI.PA": 0.25,
-    "ERF.PA": 0.02,
-    "GLE.PA": 0.25,
-    "MT.AS": 0.05251,
-    "ORA.PA": 0.25
-  },
+  "n_selected": 8,
   "data_files": {
-    "daily_raw": "/home/onyxia/work/Gestion-portefeuille/data/raw/cac40_daily_raw.parquet",
-    "monthly_features": "/home/onyxia/work/Gestion-portefeuille/data/raw/cac40_monthly_features.parquet",
-    "signals": "/home/onyxia/work/Gestion-portefeuille/latest_signals.csv",
-    "history": "/home/onyxia/work/Gestion-portefeuille/portfolio_history.csv"
+    "daily_raw": "data/raw/cac40_daily_raw.parquet",
+    "monthly_features": "data/raw/cac40_monthly_features.parquet",
+    "signals": "latest_signals.csv",
+    "history": "portfolio_history.csv"
   }
 }
