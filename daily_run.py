@@ -332,13 +332,22 @@ def run_pipeline():
     
     # 1. Signaux (Latest)
     if not today_data.empty:
-        export_df = today_data[['cluster', 'proba_hausse']].reset_index()
-        export_df.columns = ['Ticker', 'Cluster', 'Proba_Hausse']
+        # --- MODIFICATION ICI : On ajoute 'rsi' et 'return_3m' pour le graphique de l'app ---
+        cols_to_export = ['cluster', 'proba_hausse']
+        if 'rsi' in today_data.columns: cols_to_export.append('rsi')
+        if 'return_3m' in today_data.columns: cols_to_export.append('return_3m')
+        
+        export_df = today_data[cols_to_export].reset_index()
+        # Renommage propre
+        col_mapping = {'ticker':'Ticker', 'cluster':'Cluster', 'proba_hausse':'Proba_Hausse', 'rsi':'RSI', 'return_3m':'Return_3M'}
+        export_df.rename(columns=col_mapping, inplace=True)
+        
         export_df['Allocation'] = export_df['Ticker'].map(final_alloc).fillna(0.0)
         export_df['Signal'] = np.where(export_df['Allocation'] > 0, 'ACHAT', 'NEUTRE')
         export_df = export_df.sort_values(by='Allocation', ascending=False)
+        
         export_df.to_csv('latest_signals.csv', index=False)
-        print(" -> latest_signals.csv OK")
+        print(" -> latest_signals.csv OK (avec données graphiques)")
 
     # -------------------------------------------------------------
     # 2. Historique (Mise à jour incrémentale Daily)
