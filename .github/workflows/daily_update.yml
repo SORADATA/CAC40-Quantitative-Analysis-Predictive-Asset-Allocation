@@ -52,7 +52,7 @@ jobs:
       
       
       # ══════════════════════════════════════════════════════
-      # 3. Verify Generated Files (Debugging only)
+      # 3. Verify Generated Files
       # ══════════════════════════════════════════════════════
       - name: 🔍 Check generated files
         run: |
@@ -61,26 +61,40 @@ jobs:
       
       
       # ══════════════════════════════════════════════════════
-      # 4. Commit & Push Results (FIXED: NO PARQUET / FORCE MERGE)
+      # 4. Commit & Push Results (STRATÉGIE ANTI-CONFLIT)
       # ══════════════════════════════════════════════════════
       - name: 💾 Commit updated data
         run: |
           git config --local user.name 'AlphaML Bot'
           git config --local user.email '41898282+github-actions[bot]@users.noreply.github.com'
           
-          # 1. Add ONLY result files (We intentionally IGNORE parquet files to avoid conflicts)
+          # A. SAUVEGARDE TEMPORAIRE DES RÉSULTATS GÉNÉRÉS
+          # On met les nouveaux fichiers calculés à l'abri dans un dossier temporaire
+          mkdir -p /tmp/portfolio_data
+          cp latest_signals.csv /tmp/portfolio_data/ 2>/dev/null || true
+          cp portfolio_history.csv /tmp/portfolio_data/ 2>/dev/null || true
+          cp data_metadata.json /tmp/portfolio_data/ 2>/dev/null || true
+          cp debug_run.txt /tmp/portfolio_data/ 2>/dev/null || true
+          
+          # B. NETTOYAGE RADICAL (RESET)
+          # On s'assure d'être 100% aligné avec le serveur pour supprimer tout conflit fantôme
+          git fetch origin main
+          git reset --hard origin/main
+          
+          # C. RESTAURATION DES DONNÉES
+          # On ramène les fichiers frais calculés par le script
+          cp /tmp/portfolio_data/* .
+          
+          # D. PRÉPARATION DU COMMIT
+          # On ajoute uniquement les fichiers CSV/JSON (Pas de parquet !)
           git add latest_signals.csv portfolio_history.csv data_metadata.json debug_run.txt
           
-          # 2. Check if there are changes to commit
+          # E. COMMIT ET PUSH
           if ! git diff --staged --quiet; then
             TIMESTAMP=$(date +'%Y-%m-%d %H:%M UTC')
             git commit -m "chore(data): daily portfolio update ${TIMESTAMP}"
             
-            # 3. CRUCIAL FIX: Pull with rebase strategy "Theirs"
-            # This forces the bot's version to win if there is a conflict on the CSVs
-            git pull --rebase -Xtheirs origin main
-            
-            # 4. Push
+            # Pas besoin de pull complexe ici car on vient de faire un reset --hard
             git push origin main
             echo "✅ Data committed and pushed successfully"
           else
