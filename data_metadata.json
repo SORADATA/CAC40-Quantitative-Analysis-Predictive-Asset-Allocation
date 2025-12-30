@@ -1,21 +1,9 @@
 {
   "last_update": "2025-12-30T18:28:44.823183",
   "data_start": "2015-12-30T00:00:00",
-  "data_end": "2025-12-30T00:00:00",
+  "data_end": "2025-12-29T00:00:00",
   "n_stocks": 40,
-  "n_selected": 10,
-  "allocations": {
-    "ALO.PA": 0.02,
-    "BNP.PA": 0.02,
-    "CA.PA": 0.02,
-    "CS.PA": 0.02,
-    "EN.PA": 0.09749,
-    "ENGI.PA": 0.25,
-    "ERF.PA": 0.02,
-    "GLE.PA": 0.25,
-    "MT.AS": 0.05251,
-    "ORA.PA": 0.25
-  },
+  "n_selected": 8,
   "data_files": {
     "daily_raw": "data/raw/cac40_daily_raw.parquet",
     "monthly_features": "data/raw/cac40_monthly_features.parquet",
