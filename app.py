@@ -49,11 +49,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =============================================================================
-# 2. CHARGEMENT DES DONNÉES (VERSION LÉGÈRE - SANS PARQUET)
+# 2. CHARGEMENT DES DONNÉES (VERSION LÉGÈRE & ROBUSTE)
 # =============================================================================
 @st.cache_data
 def load_all_data():
-    """Charge uniquement les CSVs légers, pas de gros parquets"""
+    """Charge les CSVs avec une gestion robuste des dates (format mixed)"""
     history_file = 'portfolio_history.csv'
     signals_file = 'latest_signals.csv'
     
@@ -62,15 +62,31 @@ def load_all_data():
     
     # 1. Historique Portfolio
     if os.path.exists(history_file):
-        df_hist = pd.read_csv(history_file, index_col=0, parse_dates=True)
-        df_hist.sort_index(ascending=True, inplace=True)
+        try:
+            # On lit le CSV sans parser les dates automatiquement pour éviter les erreurs initiales
+            df_hist = pd.read_csv(history_file, index_col=0)
+            
+            # --- CORRECTIF BLINDÉ ---
+            # On force la conversion avec format='mixed' pour gérer les incohérences
+            df_hist.index = pd.to_datetime(df_hist.index, format='mixed', errors='coerce')
+            
+            # On supprime les lignes où la date n'a pas pu être lue (NaT)
+            df_hist = df_hist[df_hist.index.notna()]
+            
+            df_hist.sort_index(ascending=True, inplace=True)
+        except Exception as e:
+            st.error(f"Erreur lecture historique: {e}")
     
     # 2. Signaux Récents
     if os.path.exists(signals_file):
-        df_signals = pd.read_csv(signals_file)
+        try:
+            df_signals = pd.read_csv(signals_file)
+        except:
+            pass
 
     return df_hist, df_signals
 
+# Chargement immédiat
 df_hist, df_signals = load_all_data()
 
 # =============================================================================
@@ -116,6 +132,7 @@ def calculate_period_return(df, days=None, ytd=False):
     if target_date < df.index[0]: start_price = df['Strategy'].iloc[0]
     else:
         try:
+            # Recherche de l'index le plus proche
             idx = df.index.get_indexer([target_date], method='nearest')[0]
             start_price = df['Strategy'].iloc[idx]
         except: start_price = df['Strategy'].iloc[0]
@@ -125,14 +142,12 @@ def calculate_period_return(df, days=None, ytd=False):
 
 @st.cache_data(ttl=3600)
 def get_live_ticker_data(ticker, period="1y"):
-    """Télécharge les données en direct via yfinance (évite d'avoir besoin des parquets)"""
+    """Télécharge les données en direct via yfinance"""
     try:
         df = yf.download(ticker, period=period, progress=False)
-        # Gestion multi-index si yfinance renvoie un format complexe
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = df.columns.get_level_values(0)
         
-        # Standardisation des colonnes
         df.columns = df.columns.str.lower()
         if 'adj close' not in df.columns and 'close' in df.columns:
             df['adj close'] = df['close']
@@ -154,8 +169,17 @@ page = st.sidebar.radio("Navigation", ["Dashboard", "Daily Signals", "Data Explo
 st.sidebar.markdown("---")
 
 if not df_hist.empty:
-    st.sidebar.info(f"Last Update: {df_hist.index[-1].date()}")
+    # --- SECURITE D'AFFICHAGE DE LA DATE ---
+    last_dt = df_hist.index[-1]
+    # On vérifie si c'est bien un Timestamp avant d'appeler .date()
+    if isinstance(last_dt, pd.Timestamp):
+        date_str = last_dt.date()
+    else:
+        date_str = str(last_dt).split(" ")[0]
+        
+    st.sidebar.info(f"Last Update: {date_str}")
     st.sidebar.success("● System Online")
+
 st.sidebar.markdown("---")
 st.sidebar.caption("⚠️ **Disclaimer:** Not financial advice.")
 
@@ -247,13 +271,12 @@ elif page == "Daily Signals":
 elif page == "Data Explorer":
     st.title("🔎 Market Data Explorer")
     
-    # Initialisation des variables pour éviter les NameError
+    # Initialisation variables
     last_close = 0.0
     daily_var = 0.0
     total_ret_period = 0.0
     volatility = 0.0
     
-    # Liste par défaut
     default_tickers = ["AI.PA", "AIR.PA", "BNP.PA", "MC.PA", "OR.PA", "TTE.PA"]
     if not df_signals.empty and 'Ticker' in df_signals.columns:
         tickers = df_signals['Ticker'].unique().tolist()
@@ -266,15 +289,12 @@ elif page == "Data Explorer":
     with col_sel2:
         period_exp = st.selectbox("Timeframe", ["1 Month", "3 Months", "6 Months", "1 Year", "5 Years"], index=2)
     
-    # Mapping Période
     yf_period_map = {"1 Month":"1mo", "3 Months":"3mo", "6 Months":"6mo", "1 Year":"1y", "5 Years":"5y"}
     
-    # Chargement LIVE
     with st.spinner(f"Downloading data for {selected_ticker}..."):
         df_asset = get_live_ticker_data(selected_ticker, period=yf_period_map[period_exp])
     
     if not df_asset.empty and len(df_asset) > 1:
-        # --- CALCULS SÉCURISÉS ---
         try:
             last_close = df_asset['adj close'].iloc[-1]
             prev_close = df_asset['adj close'].iloc[-2]
@@ -284,30 +304,24 @@ elif page == "Data Explorer":
             if first_p != 0:
                 total_ret_period = (last_close / first_p) - 1
             
-            # Volatilité annualisée
             ret_series = df_asset['adj close'].pct_change().dropna()
             if not ret_series.empty:
                 volatility = ret_series.std() * np.sqrt(252)
         except Exception as e:
             st.error(f"Error calculating metrics: {e}")
 
-        # --- AFFICHAGE ---
         m1, m2, m3, m4 = st.columns(4)
         with m1: display_kpi_card("Last Price", last_close, is_percent=False, prefix="€ ")
         with m2: display_kpi_card("Daily Change", daily_var, color_code=True)
         with m3: display_kpi_card(f"Return ({period_exp})", total_ret_period, color_code=True)
         with m4: display_kpi_card("Annualized Volatility", volatility, is_percent=True)
         
-        # Graphique
         st.subheader(f"Price Action : {selected_ticker}")
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.05, row_heights=[0.7, 0.3])
         fig.add_trace(go.Candlestick(x=df_asset.index, open=df_asset['open'], high=df_asset['high'],
             low=df_asset['low'], close=df_asset['close'], name='OHLC'), row=1, col=1)
-        
-        # Couleurs Volume
         colors = ['#00CC96' if r >= 0 else '#EF553B' for r in df_asset['adj close'].pct_change().fillna(0)]
         fig.add_trace(go.Bar(x=df_asset.index, y=df_asset['volume'], name='Volume', marker_color=colors), row=2, col=1)
-        
         fig.update_layout(template="plotly_dark", xaxis_rangeslider_visible=False, height=500, margin=dict(l=0,r=0,t=0,b=0))
         st.plotly_chart(fig, use_container_width=True)
     else:
@@ -322,17 +336,16 @@ elif page == "Model Details":
     
     with tab1:
         st.markdown("""
-        ### 🧠 Hybrid Strategy Components
+        ###  Hybrid Strategy Components
         **1. Machine Learning Filter (XGBoost)**: Predicts 1-month upside probability based on Momentum, Volatility & Macro factors.
         **2. Clustering (K-Means)**: Segments stocks by market regime (Target: Cluster 3).
         **3. Portfolio Optimization (Markowitz)**: Maximizes Sharpe Ratio with constraints.
         """)
         st.markdown("---")
-        # Ici on charge les métriques JSON si elles existent
         try:
             with open("src/models/metrics.json", "r") as f:
                 metrics = json.load(f)
-            st.markdown("### 📊 Model Performance (Test Set)")
+            st.markdown("### Model Performance (Test Set)")
             col1, col2, col3, col4 = st.columns(4)
             with col1: st.metric("Accuracy", f"{metrics.get('accuracy',0):.2%}")
             with col2: st.metric("Precision", f"{metrics.get('precision',0):.2%}")
@@ -345,7 +358,6 @@ elif page == "Model Details":
         st.subheader("Market Regime Clustering")
         st.markdown("Groups assets based on RSI behavior to identify Momentum vs Reversal regimes.")
         
-        # UTILISATION DES DONNÉES DU CSV LÉGER 'latest_signals.csv' (Plus besoin de Parquet)
         if not df_signals.empty and 'RSI' in df_signals.columns and 'Return_3M' in df_signals.columns:
             fig_scatter = px.scatter(
                 df_signals, x="RSI", y="Return_3M", color="Cluster", hover_name="Ticker",
@@ -356,8 +368,7 @@ elif page == "Model Details":
             fig_scatter.update_layout(template="plotly_dark", height=500)
             st.plotly_chart(fig_scatter, use_container_width=True)
         else:
-            st.warning("⚠️ Data for clustering visualization missing. Please wait for the next Daily Run.")
-            st.caption("Once 'daily_run.py' is executed with the new code, this chart will appear automatically.")
+            st.warning("⚠️ Data for clustering visualization missing.")
 
 # =============================================================================
 # DISCLAIMER FOOTER
