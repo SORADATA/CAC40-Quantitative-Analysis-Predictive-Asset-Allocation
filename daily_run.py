@@ -352,7 +352,7 @@ def run_pipeline():
     # -------------------------------------------------------------
     # 2. Historique (Mise à jour incrémentale Daily)
     # -------------------------------------------------------------
-    print("📜 Mise à jour de l'historique Strategy vs Benchmark...")
+    print(" Mise à jour de l'historique Strategy vs Benchmark...")
 
     history_file = 'portfolio_history.csv'
 
