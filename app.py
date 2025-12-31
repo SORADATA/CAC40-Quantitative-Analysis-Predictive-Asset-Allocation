@@ -8,6 +8,7 @@ import os
 import numpy as np
 import json
 import yfinance as yf  # NÉCESSAIRE POUR LA VERSION LIVE
+from streamlit_autorefresh import st_autorefresh # AJOUT DEMANDÉ
 
 # =============================================================================
 # 1. CONFIGURATION & STYLE
@@ -17,6 +18,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# REFRESH AUTOMATIQUE (AJOUT DEMANDÉ)
+st_autorefresh(interval=900000, key="datarefresh")
 
 # CSS Personnalisé
 st.markdown("""
@@ -49,9 +53,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =============================================================================
-# 2. CHARGEMENT DES DONNÉES (VERSION LÉGÈRE & ROBUSTE)
+# 2. CHARGEMENT DES DONNÉES (VERSION AVEC TTL DEMANDÉ)
 # =============================================================================
-@st.cache_data
+@st.cache_data(ttl=600) # MODIF TTL DEMANDÉE
 def load_all_data():
     """Charge les CSVs avec une gestion robuste des dates (format mixed)"""
     history_file = 'portfolio_history.csv'
@@ -63,16 +67,9 @@ def load_all_data():
     # 1. Historique Portfolio
     if os.path.exists(history_file):
         try:
-            # On lit le CSV sans parser les dates automatiquement pour éviter les erreurs initiales
             df_hist = pd.read_csv(history_file, index_col=0)
-            
-            # --- CORRECTIF BLINDÉ ---
-            # On force la conversion avec format='mixed' pour gérer les incohérences
             df_hist.index = pd.to_datetime(df_hist.index, format='mixed', errors='coerce')
-            
-            # On supprime les lignes où la date n'a pas pu être lue (NaT)
             df_hist = df_hist[df_hist.index.notna()]
-            
             df_hist.sort_index(ascending=True, inplace=True)
         except Exception as e:
             st.error(f"Erreur lecture historique: {e}")
@@ -120,8 +117,12 @@ def calculate_metrics(df):
     max_dd = ((cum_ret - cum_ret.cummax()) / cum_ret.cummax()).min()
     return total_ret, alpha, sharpe, max_dd
 
-def calculate_period_return(df, days=None, ytd=False):
+def calculate_period_return(df, days=None, ytd=False, daily=False): # MODIF AJOUT DAILY
     if df.empty or 'Strategy' not in df.columns: return 0.0
+    
+    if daily and len(df) >= 2: # LOGIQUE DAILY DEMANDÉE
+        return (df['Strategy'].iloc[-1] / df['Strategy'].iloc[-2]) - 1
+        
     last_price = df['Strategy'].iloc[-1]
     last_date = df.index[-1]
     
@@ -132,7 +133,6 @@ def calculate_period_return(df, days=None, ytd=False):
     if target_date < df.index[0]: start_price = df['Strategy'].iloc[0]
     else:
         try:
-            # Recherche de l'index le plus proche
             idx = df.index.get_indexer([target_date], method='nearest')[0]
             start_price = df['Strategy'].iloc[idx]
         except: start_price = df['Strategy'].iloc[0]
@@ -161,6 +161,11 @@ def get_live_ticker_data(ticker, period="1y"):
 st.sidebar.title("AlphaEdge")
 st.sidebar.caption("Quantitative Asset Allocation")
 
+# BOUTON SYNC (AJOUT DEMANDÉ)
+if st.sidebar.button("🔄 Force Sync Pipeline"):
+    st.cache_data.clear()
+    st.rerun()
+
 github_url = "https://github.com/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation"
 st.sidebar.markdown(f"[![GitHub](https://img.shields.io/badge/GITHUB-Source_Code-181717?style=for-the-badge&logo=github&logoColor=white)]({github_url})")
 
@@ -169,9 +174,7 @@ page = st.sidebar.radio("Navigation", ["Dashboard", "Daily Signals", "Data Explo
 st.sidebar.markdown("---")
 
 if not df_hist.empty:
-    # --- SECURITE D'AFFICHAGE DE LA DATE ---
     last_dt = df_hist.index[-1]
-    # On vérifie si c'est bien un Timestamp avant d'appeler .date()
     if isinstance(last_dt, pd.Timestamp):
         date_str = last_dt.date()
     else:
@@ -198,11 +201,12 @@ if page == "Dashboard":
         
         st.markdown("<br>", unsafe_allow_html=True)
         st.subheader(" Period Performance")
-        k1, k2, k3, k4 = st.columns(4)
+        k1, k2, k3, k4, k5 = st.columns(5) # CHANGÉ EN 5 COLONNES
         with k1: display_kpi_card("YTD", calculate_period_return(df_hist, ytd=True), color_code=True, minimal=True)
         with k2: display_kpi_card("6 Months", calculate_period_return(df_hist, days=180), color_code=True, minimal=True)
         with k3: display_kpi_card("3 Months", calculate_period_return(df_hist, days=90), color_code=True, minimal=True)
         with k4: display_kpi_card("1 Month", calculate_period_return(df_hist, days=30), color_code=True, minimal=True)
+        with k5: display_kpi_card("Daily Return", calculate_period_return(df_hist, daily=True), color_code=True, minimal=True) # AJOUT DEMANDÉ
         
         st.markdown("---")
         col_title, col_filter = st.columns([2, 1])
@@ -271,7 +275,6 @@ elif page == "Daily Signals":
 elif page == "Data Explorer":
     st.title("🔎 Market Data Explorer")
     
-    # Initialisation variables
     last_close = 0.0
     daily_var = 0.0
     total_ret_period = 0.0
