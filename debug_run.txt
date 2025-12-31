@@ -1,4 +1,4 @@
-Run finished at 2025-12-31 18:17:53.319331
+Run finished at 2025-12-31 20:17:04.525797
 Daily data shape: (100572, 14)
 Monthly data shape: (4673, 26)
 Selected stocks: 10
