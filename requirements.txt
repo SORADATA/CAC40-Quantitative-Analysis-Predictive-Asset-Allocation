@@ -29,3 +29,4 @@ tqdm>=4.66.1
 
 # Web App
 streamlit>=1.30.0
+streamlit-autorefresh
