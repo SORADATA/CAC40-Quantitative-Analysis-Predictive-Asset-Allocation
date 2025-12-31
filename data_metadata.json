@@ -1,13 +1,25 @@
 {
-  "last_update": "2025-12-30T20:22:50.984897",
-  "data_start": "2015-12-30T00:00:00",
-  "data_end": "2025-12-29T00:00:00",
+  "last_update": "2025-12-31T18:17:53.317811",
+  "data_start": "2016-01-04T00:00:00",
+  "data_end": "2025-12-31T00:00:00",
   "n_stocks": 40,
-  "n_selected": 8,
+  "n_selected": 10,
+  "allocations": {
+    "ALO.PA": 0.02,
+    "BNP.PA": 0.02,
+    "CA.PA": 0.03276,
+    "CS.PA": 0.02,
+    "EN.PA": 0.25,
+    "ENGI.PA": 0.25,
+    "ERF.PA": 0.04441,
+    "GLE.PA": 0.25,
+    "MC.PA": 0.02,
+    "MT.AS": 0.09283
+  },
   "data_files": {
-    "daily_raw": "data/raw/cac40_daily_raw.parquet",
-    "monthly_features": "data/raw/cac40_monthly_features.parquet",
-    "signals": "latest_signals.csv",
-    "history": "portfolio_history.csv"
+    "daily_raw": "/home/runner/work/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/data/raw/cac40_daily_raw.parquet",
+    "monthly_features": "/home/runner/work/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/data/raw/cac40_monthly_features.parquet",
+    "signals": "/home/runner/work/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/latest_signals.csv",
+    "history": "/home/runner/work/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/portfolio_history.csv"
   }
 }
