@@ -1,15 +1,15 @@
-Run finished at 2026-01-01 18:18:30.941859
-Daily data shape: (100572, 14)
-Monthly data shape: (4673, 26)
-Selected stocks: 10
-Allocations: OrderedDict([('ALO.PA', 0.02), ('BNP.PA', 0.02), ('CA.PA', 0.03276), ('CS.PA', 0.02), ('EN.PA', 0.25), ('ENGI.PA', 0.25), ('ERF.PA', 0.04441), ('GLE.PA', 0.25), ('MC.PA', 0.02), ('MT.AS', 0.09283)])
+Run finished at 2026-01-02 18:17:17.469701
+Daily data shape: (100612, 14)
+Monthly data shape: (4713, 26)
+Selected stocks: 11
+Allocations: OrderedDict([('ALO.PA', 0.02), ('BNP.PA', 0.02), ('CA.PA', 0.02), ('CS.PA', 0.02), ('EN.PA', 0.08312), ('ENGI.PA', 0.25), ('FR.PA', 0.02), ('GLE.PA', 0.25), ('MT.AS', 0.04688), ('ORA.PA', 0.25), ('STMPA.PA', 0.02)])
 
 === Latest Values ===
-Strategy: 128.06
-Benchmark: 104.22
+Strategy: 130.49
+Benchmark: 104.80
 
 === File Paths ===
 Project root: /home/runner/work/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation
 History file: /home/runner/work/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/portfolio_history.csv
 History exists: True
-History size: 35226 bytes
+History size: 35250 bytes
