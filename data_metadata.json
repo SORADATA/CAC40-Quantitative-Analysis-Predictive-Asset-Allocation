@@ -1,5 +1,5 @@
 {
-  "last_update": "2026-01-07T19:35:34.103981",
+  "last_update": "2026-01-07T20:47:12.615263",
   "data_start": "2016-01-07T00:00:00",
   "data_end": "2026-01-07T00:00:00",
   "n_stocks": 40,
@@ -23,10 +23,9 @@
     "VIE.PA": 0.02
   },
   "data_files": {
-    "daily_raw": "/home/onyxia/work/Gestion-portefeuille/data/raw/cac40_daily_raw.parquet",
-    "monthly_features": "/home/onyxia/work/Gestion-portefeuille/data/raw/cac40_monthly_features.parquet",
-    "signals": "/home/onyxia/work/Gestion-portefeuille/latest_signals.csv",
-    "history": "/home/onyxia/work/Gestion-portefeuille/portfolio_history.csv",
-    "rebalance": "/home/onyxia/work/Gestion-portefeuille/rebalance_history.csv"
+    "daily_raw": "/home/runner/work/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/data/raw/cac40_daily_raw.parquet",
+    "monthly_features": "/home/runner/work/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/data/raw/cac40_monthly_features.parquet",
+    "signals": "/home/runner/work/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/latest_signals.csv",
+    "history": "/home/runner/work/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/portfolio_history.csv"
   }
 }
