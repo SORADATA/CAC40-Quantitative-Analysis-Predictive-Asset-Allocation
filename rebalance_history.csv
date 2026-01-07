@@ -112,7 +112,7 @@ Date,N_Stocks,Allocation
 2025-04-30,9,"OrderedDict({'CS.PA': 0.02, 'DG.PA': 0.02, 'EN.PA': 0.1329, 'ENGI.PA': 0.25, 'ERF.PA': 0.0371, 'GLE.PA': 0.25, 'OR.PA': 0.02, 'ORA.PA': 0.25, 'VIE.PA': 0.02})"
 2025-05-30,12,"OrderedDict({'BNP.PA': 0.02, 'CS.PA': 0.02, 'ENGI.PA': 0.25, 'ERF.PA': 0.02781, 'GLE.PA': 0.25, 'HO.PA': 0.07886, 'LR.PA': 0.02333, 'ML.PA': 0.02, 'ORA.PA': 0.25, 'SAF.PA': 0.02, 'URW.PA': 0.02, 'VIV.PA': 0.02})"
 2025-06-30,6,"OrderedDict({'AIR.PA': 0.02343, 'ENGI.PA': 0.33333, 'ERF.PA': 0.23331, 'LR.PA': 0.15823, 'SAF.PA': 0.23169, 'STMPA.PA': 0.02})"
-2025-07-31,8,"OrderedDict({'ERF.PA': 0.20741, 'GLE.PA': 0.25, 'KER.PA': 0.05134, 'LR.PA': 0.09191, 'OR.PA': 0.02, 'SAF.PA': 0.12124, 'URW.PA': 0.2381, 'VIV.PA': 0.02})"
+2025-07-31,8,"OrderedDict({'ERF.PA': 0.20741, 'GLE.PA': 0.25, 'KER.PA': 0.05134, 'LR.PA': 0.0919, 'OR.PA': 0.02, 'SAF.PA': 0.12124, 'URW.PA': 0.2381, 'VIV.PA': 0.02})"
 2025-08-29,0,{}
 2025-09-30,6,"OrderedDict({'AIR.PA': 0.02, 'ATO.PA': 0.184, 'HO.PA': 0.33333, 'KER.PA': 0.15209, 'LR.PA': 0.11863, 'SAF.PA': 0.19195})"
 2025-10-31,6,"OrderedDict({'AIR.PA': 0.27182, 'EL.PA': 0.08125, 'ENGI.PA': 0.33333, 'FR.PA': 0.05253, 'LR.PA': 0.24107, 'MC.PA': 0.02})"
