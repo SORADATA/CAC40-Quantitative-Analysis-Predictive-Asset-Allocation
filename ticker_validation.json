@@ -1,0 +1,11 @@
+{
+  "date": "2026-01-07T18:53:04.362198",
+  "total_tickers_requested": 40,
+  "valid_tickers": 40,
+  "alerts": {
+    "delisted": [],
+    "stale": [],
+    "missing": [],
+    "warnings": []
+  }
+}
