@@ -4,9 +4,11 @@ data/interim/
 data/processed/
 results/
 
+
 # Fichiers Python/Jupyter/Environnement
 __pycache__/
 *.ipynb_checkpoints/
+
 
 # Modèles entraînés
 # models/
@@ -15,16 +17,21 @@ __pycache__/
 *.keras
 *.joblib
 
+
 # Images GÉNÉRÉES par les scripts (dans models/)
 models/*.png
 models/*.jpg
 models/advanced/*.png
 
+
 # Logs et temporaires
 *.log
 logs/
+
 
 # Configuration système
 .DS_Store
 .vscode/
 *.swp
+
+
