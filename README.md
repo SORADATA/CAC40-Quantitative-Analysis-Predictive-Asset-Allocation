@@ -1,8 +1,4 @@
-C'est compris. Le format précédent s'est "cassé" à la fin, rendant le copier-coller difficile pour les sections techniques.
 
-Voici **l'intégralité du code Markdown** dans un seul bloc propre. Tu n'as qu'à cliquer sur "Copier" en haut à droite du bloc noir ci-dessous et tout coller dans ton fichier `README.md`.
-
-```markdown
 <div align="center">
   
   # 📈 AlphaEdge: CAC40 AI-Powered Portfolio Manager
@@ -58,50 +54,35 @@ graph LR
     G --> H[📤 Export: CSV/JSON]
     H --> I[📊 Streamlit Dashboard]
 
-```
+🛠️ Installation & Usage
+1. Clone the Repository
+Bash
 
----
-
-## 🛠️ Installation & Usage
-
-### 1. Clone the Repository
-
-```bash
 git clone [https://github.com/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation.git](https://github.com/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation.git)
 cd CAC40-Quantitative-Analysis-Predictive-Asset-Allocation
 
-```
-
-### 2. Install Dependencies
+2. Install Dependencies
 
 It is recommended to use a virtual environment.
+Bash
 
-```bash
 pip install -r requirements.txt
 
-```
+3. Run the Dashboard Locally
+Bash
 
-### 3. Run the Dashboard Locally
-
-```bash
 streamlit run app.py
 
-```
-
-### 4. Run the Pipeline Manually
+4. Run the Pipeline Manually
 
 To trigger the ETL, prediction, and rebalancing process immediately:
+Bash
 
-```bash
 python daily_run.py
 
-```
+📂 Project Structure
+Bash
 
----
-
-## 📂 Project Structure
-
-```bash
 ├── .github/workflows/    # CI/CD: Daily pipeline configuration
 ├── data/                 # Raw and Processed data (Parquet/CSV)
 ├── images/               # Assets for README and App (Screenshots)
@@ -113,40 +94,26 @@ python daily_run.py
 ├── daily_run.py          # Main Pipeline Script (ETL + Inference)
 └── requirements.txt      # Python Dependencies
 
-```
+🌍 How to Fork & Adapt
 
----
+Want to apply this strategy to the S&P 500 or Crypto?
 
-## 🌍 How to Fork & Adapt
+    Fork this repo (Top right corner).
 
-Want to apply this strategy to the **S&P 500** or **Crypto**?
+    Edit daily_run.py: Change the CAC40_TICKERS list to your desired assets.
 
-1. **Fork this repo** (Top right corner).
-2. **Edit `daily_run.py**`: Change the `CAC40_TICKERS` list to your desired assets.
-3. **Push changes**: The automated pipeline will immediately start processing your new tickers.
+    Push changes: The automated pipeline will immediately start processing your new tickers.
 
----
+⚠️ Disclaimer
 
-## ⚠️ Disclaimer
-
-*This project is for educational and research purposes only. It does not constitute financial advice. Algorithmic trading involves substantial risk of loss. Past performance is not indicative of future results.*
-
----
+This project is for educational and research purposes only. It does not constitute financial advice. Algorithmic trading involves substantial risk of loss. Past performance is not indicative of future results.
 
 <div align="center">
 
-**Developed by SORADATA**
+Developed by SORADATA
 
+Master 2 Statistics & Econometrics
 
-
-
-
-*Master 2 Statistics & Econometrics*
-
-[⭐ Star this repo if you find it useful!](https://github.com/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation)
+⭐ Star this repo if you find it useful!
 
 </div>
-
-```
-
-```
