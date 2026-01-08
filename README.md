@@ -7,17 +7,24 @@
 [![Status](https://img.shields.io/badge/Status-Live_Production-success.svg)]()
 [![Pipeline](https://img.shields.io/badge/GitHub_Actions-Automated-blueviolet.svg)]()
 [![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+![Python](https://img.shields.io/badge/python-3.9+-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![GitHub last commit](https://img.shields.io/github/last-commit/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation)
+![GitHub stars](https://img.shields.io/github/stars/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation?style=social)
+![GitHub forks](https://img.shields.io/github/forks/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation?style=social)
 
 ---
 
 ## 🎯 Project Overview
+**AlphaEdge** est un système automatisé de gestion de portefeuille pour le CAC40, combinant :
+- **Détection de régimes de marché** (K-Means)
+- **Prédiction directionnelle** (XGBoost)
+- **Optimisation de risque** (Markowitz)
+- **Exécution serverless** (GitHub Actions + Streamlit)
+ 
+📈 **Résultats** : Surperformance du CAC40 grâce à une allocation dynamique et data-driven.
 
-**AlphaEdge** is an intelligent, fully automated portfolio management system designed to outperform the CAC40 index. It eliminates human bias by combining three rigorous layers of analysis:
-
-1.  **Market Regime Detection (K-Means):** Identifies behavioral clusters (Momentum, Value, Defensive).
-2.  **Directional Prediction (XGBoost):** Probabilistic forecasting of 1-month future returns.
-3.  **Risk Optimization (Markowitz/MPT):** Maximizes the Sharpe Ratio via Efficient Frontier allocation.
+![AlphaEdge Dashboard](https://raw.githubusercontent.com/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/main/images/dashboard_screenshot.png)
 
 ### 🔗 [Click here to access the Live Dashboard](https://cac40-smart-portfolio-asset.streamlit.app/)
 
@@ -36,25 +43,27 @@ graph LR
     E -->|Commit CSV| F[GitHub Repo]
     F -->|Auto-Update| G[Streamlit Cloud]
 ```
-
+## 📊 Example Output
+| Ticker  | Cluster | Proba_Hausse | Allocation | Signal  |
+|---------|---------|--------------|------------|---------|
+| LVMH.PA | 3       | 0.78         | 0.15       | ACHAT   |
+| TOT.PA  | 1       | 0.45         | 0.00       | NEUTRE  |
 ---
 
-## 🛠️ Installation & Local Usage
-
-If you want to run the model locally instead of using the cloud app:
+## 🚀 Quick Start
 ```bash
-# 1. Clone the repository
+# Clone the repo
 git clone https://github.com/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation.git
-
-# 2. Install dependencies
+cd CAC40-Quantitative-Analysis-Predictive-Asset-Allocation
+ 
+# Install dependencies
 pip install -r requirements.txt
-
-# 3. Run the Streamlit Dashboard
+ 
+# Run the dashboard
 streamlit run app.py
-
-# 4. (Optional) Force a model update
+ 
+# (Optional) Run the pipeline manually
 python daily_run.py
-```
 
 ---
 
