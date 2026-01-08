@@ -276,7 +276,7 @@ page = st.sidebar.radio("Navigation", [
 ])
 st.sidebar.markdown("---")
 
-# STATUS INDICATOR (AMÉLIORÉ)
+# STATUS INDICATOR 
 if not df_hist.empty:
     last_dt = df_hist.index[-1]
     date_str = last_dt.date() if isinstance(last_dt, pd.Timestamp) else str(last_dt).split(" ")[0]
@@ -299,7 +299,7 @@ else:
 
 st.sidebar.markdown("---")
 
-# TICKER HEALTH (NOUVEAU)
+# TICKER HEALTH 
 if os.path.exists('ticker_validation.json'):
     with st.sidebar.expander("🔍 Ticker Health", expanded=False):
         try:
@@ -378,7 +378,7 @@ if page == "Dashboard":
         
         col_title, col_filter = st.columns([2, 1])
         with col_title: 
-            st.subheader(" Strategy vs Benchmark")
+            st.subheader("Strategy vs Benchmark")
         with col_filter:
             p_sel = st.radio("Zoom:", ["1M", "3M", "6M", "YTD", "1Y", "ALL"], index=5, horizontal=True, label_visibility="collapsed")
         
@@ -558,7 +558,7 @@ elif page == "Data Explorer":
         with m3: display_kpi_card(f"Return ({period_exp})", total_ret_period, color_code=True)
         with m4: display_kpi_card("Ann. Volatility", volatility, is_percent=True)
         
-        st.subheader(f" Price Action: {selected_ticker}")
+        st.subheader(f"Price Action: {selected_ticker}")
         
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.05, row_heights=[0.7, 0.3])
         fig.add_trace(go.Candlestick(x=df_asset.index, open=df_asset['open'], high=df_asset['high'], low=df_asset['low'], close=df_asset['close'], name='OHLC'), row=1, col=1)
@@ -581,7 +581,7 @@ elif page == "Model Details":
     
     with tab1:
         st.markdown("""
-        ### 🧩 Hybrid Strategy Components
+        ### Hybrid Strategy Components
         **1. XGBoost**: Predicts 1-month upside probability  
         **2. K-Means**: Market regime detection (RSI-based)  
         **3. Markowitz**: Portfolio optimization (Max Sharpe)
@@ -592,7 +592,7 @@ elif page == "Model Details":
             with open("src/models/metrics.json", "r") as f:
                 metrics = json.load(f)
             
-            st.markdown("### 📈 Model Performance (Test Set)")
+            st.markdown("### Model Performance (Test Set)")
             col1, col2, col3, col4 = st.columns(4)
             with col1: st.metric("Accuracy", f"{metrics.get('accuracy', 0):.2%}")
             with col2: st.metric("Precision", f"{metrics.get('precision', 0):.2%}")
@@ -624,7 +624,7 @@ elif page == "Model Details":
 # PAGE 5 : REBALANCE HISTORY
 # =============================================================================
 
-elif page == " Rebalance History":
+elif page == "Rebalance History":
     st.title(" Monthly Rebalancing History")
     
     if not df_rebalance.empty:
