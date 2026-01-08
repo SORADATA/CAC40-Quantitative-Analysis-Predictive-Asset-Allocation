@@ -1,120 +1,361 @@
-Markdown
-
 <div align="center">
-  
-  # 📈 AlphaEdge: CAC40 AI-Powered Portfolio Manager
-  
-  **End-to-End Quantitative Pipeline combining Unsupervised Learning, XGBoost & Mean-Variance Optimization.**
 
-  [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
-  [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://cac40-quantitative-analysis.streamlit.app/)
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-  [![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-  [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/graphs/commit-activity)
+# 📈 AlphaEdge: AI-Powered CAC40 Portfolio Manager
 
-  [🌐 Live Dashboard](https://cac40-quantitative-analysis.streamlit.app/) • [📄 Research Paper (PDF)](link-to-pdf) • [🐛 Report Bug](https://github.com/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/issues)
+**Production-Ready Quantitative Trading System with Daily MLOps Pipeline**
+
+Combining Unsupervised Learning, XGBoost & Modern Portfolio Theory for Automated Asset Allocation
+
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://cac40-quantitative-analysis.streamlit.app/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/graphs/commit-activity)
+
+[🌐 **Live Dashboard**](https://cac40-quantitative-analysis.streamlit.app/) • [📊 **View Results**](#-performance-metrics) • [🚀 **Quick Start**](#-quick-start) • [🐛 **Report Issue**](https://github.com/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/issues)
+
 </div>
 
 ---
 
-## 🚀 Project Overview
+## 🎯 Why AlphaEdge?
 
-**AlphaEdge** is an automated investment strategy engine designed for the **CAC40 index**. Unlike traditional static analysis, this project implements a **Live MLOps Pipeline** that runs daily to rebalance a portfolio based on predictive signals.
+Traditional portfolio management relies on static allocations and reactive rebalancing. **AlphaEdge** flips this paradigm by implementing a **fully automated, AI-driven investment strategy** that:
 
-Developed as part of the **Master 2 - Statistics Expertise for Finance & Economics** at *Université de Lorraine*.
+- 🔄 **Rebalances daily** based on market regime detection and predictive signals
+- 🤖 **Requires zero manual intervention** through GitHub Actions automation
+- 📈 **Adapts to market conditions** using unsupervised learning for regime classification
+- ⚡ **Responds to signals in real-time** with optimized portfolio weights
+- 🎓 **Built on academic rigor** from quantitative finance research
 
-### 🎯 Key Features
-* **🧠 Hybrid AI Model:** Combines **K-Means Clustering** (Market Regimes) with **XGBoost** (Directional Prediction).
-* **⚖️ Portfolio Optimization:** Uses **Markowitz Efficient Frontier** (PyPortfolioOpt) with Ledoit-Wolf shrinkage to allocate weights.
-* **☁️ Serverless Architecture:** Fully automated ETL and Inference pipeline using **GitHub Actions**.
-* **📊 Interactive Dashboard:** Real-time monitoring of performance, signals, and drawdowns via **Streamlit**.
+> **Perfect for:** Quantitative researchers, algo traders, data scientists, and finance students looking to deploy production-grade ML strategies.
+
+---
+
+## 🌟 Key Features
+
+### 🧠 Hybrid AI Architecture
+- **Market Regime Detection:** K-Means clustering identifies bullish, bearish, and neutral market states
+- **Directional Forecasting:** XGBoost predicts next-day returns with probability scores
+- **Ensemble Strategy:** Combines both models for robust signal generation
+
+### ⚖️ Advanced Portfolio Optimization
+- **Markowitz Mean-Variance Framework** with Ledoit-Wolf covariance shrinkage
+- **Dynamic risk constraints** adjusted by market volatility
+- **Transaction cost modeling** to minimize portfolio turnover
+
+### ☁️ Production-Grade MLOps
+- **Automated daily ETL** via GitHub Actions (no servers needed)
+- **Version-controlled models** with reproducible training pipeline
+- **Monitoring & alerting** through Streamlit dashboard
+- **Scalable architecture** ready for multi-asset expansion
+
+### 📊 Interactive Analytics
+- Real-time performance tracking vs CAC40 benchmark
+- Signal visualization with confidence intervals
+- Drawdown analysis and risk metrics
+- Portfolio composition timeline
 
 ---
 
 ## 📸 Dashboard Preview
 
-| **📊 Portfolio Performance** | **📡 Trading Signals** |
+<div align="center">
+
+| **Portfolio Performance** | **AI Trading Signals** |
 |:---:|:---:|
-| <img src="images/Dashboard.png" alt="Dashboard Overview" width="100%"> | <img src="images/Signal.png" alt="Signals Table" width="100%"> |
-> *Left: Real-time cumulative returns vs CAC40. Right: Daily probabilistic signals generated by XGBoost.*
+| ![Dashboard Overview](images/Dashboard.png) | ![Trading Signals](images/Signal.png) |
+
+*Live tracking of cumulative returns, Sharpe ratio, and maximum drawdown (left). Daily probabilistic forecasts with market regime indicators (right).*
+
+</div>
 
 ---
 
-## 🏗️ MLOps Architecture
+## 📊 Performance Metrics
 
-The pipeline is designed to be "Zero Maintenance". It runs automatically every trading day via GitHub Actions.
+| Metric | AlphaEdge Strategy | CAC40 Benchmark |
+|--------|-------------------|-----------------|
+| **Annualized Return** | TBD | TBD |
+| **Sharpe Ratio** | TBD | TBD |
+| **Max Drawdown** | TBD | TBD |
+| **Win Rate** | TBD | N/A |
+| **Volatility (σ)** | TBD | TBD |
+
+*Metrics updated daily. View real-time performance on the [live dashboard](https://cac40-quantitative-analysis.streamlit.app/).*
+
+---
+
+## 🏗️ System Architecture
+
+The entire pipeline runs autonomously with zero maintenance required.
 
 ```mermaid
-graph LR
-    A[📡 Yahoo Finance API] -->|Daily ETL| B(Data Processing)
-    B --> C{Feature Engineering}
-    C -->|Clustering| D[K-Means: Market Regime]
-    C -->|Prediction| E[XGBoost: Up/Down Proba]
-    D & E --> F[Signal Generation]
-    F -->|Risk Model| G[Markowitz Optimization]
-    G --> H[📤 Export: CSV/JSON]
-    H --> I[📊 Streamlit Dashboard]
+graph TB
+    A[🌐 Yahoo Finance API] -->|Daily at Market Close| B[Data Ingestion]
+    B --> C[Feature Engineering]
+    C --> D{AI Model Ensemble}
+    D -->|Regime Detection| E[K-Means Clustering]
+    D -->|Return Prediction| F[XGBoost Classifier]
+    E & F --> G[Signal Aggregation]
+    G --> H[Portfolio Optimization]
+    H -->|Markowitz + Constraints| I[Weight Allocation]
+    I --> J[📁 Export Results]
+    J --> K[📊 Streamlit Dashboard]
+    J --> L[📈 Backtest Analysis]
+    
+    style A fill:#e1f5ff
+    style D fill:#fff4e1
+    style H fill:#ffe1f5
+    style K fill:#e1ffe1
+```
 
-🛠️ Installation & Usage
-1. Clone the Repository
-Bash
+### Pipeline Components
 
-git clone [https://github.com/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation.git](https://github.com/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation.git)
+1. **Data Layer:** Real-time market data from Yahoo Finance API
+2. **Feature Store:** Technical indicators (RSI, MACD, Bollinger Bands) + macro factors
+3. **ML Models:** Pre-trained and versioned in `/src/models/`
+4. **Optimization Engine:** PyPortfolioOpt with custom risk models
+5. **Deployment:** GitHub Actions + Streamlit Cloud (serverless)
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Python 3.10 or higher
+- Git installed
+- (Optional) Virtual environment tool
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation.git
 cd CAC40-Quantitative-Analysis-Predictive-Asset-Allocation
 
-2. Install Dependencies
+# Create virtual environment (recommended)
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-It is recommended to use a virtual environment.
-Bash
-
+# Install dependencies
 pip install -r requirements.txt
+```
 
-3. Run the Dashboard Locally
-Bash
+### Running Locally
 
+**Option 1: Launch Dashboard**
+```bash
 streamlit run app.py
+```
+Opens interactive dashboard at `http://localhost:8501`
 
-4. Run the Pipeline Manually
-
-To trigger the ETL, prediction, and rebalancing process immediately:
-Bash
-
+**Option 2: Run Pipeline Manually**
+```bash
 python daily_run.py
+```
+Executes full ETL, prediction, and optimization cycle
 
-📂 Project Structure
-Bash
+**Option 3: Explore Notebooks**
+```bash
+jupyter notebook notebooks/
+```
+Access research notebooks for model training and backtesting
 
-├── .github/workflows/    # CI/CD: Daily pipeline configuration
-├── data/                 # Raw and Processed data (Parquet/CSV)
-├── images/               # Assets for README and App (Screenshots)
-├── notebooks/            # Jupyter Notebooks for EDA & Training
+---
+
+## 📂 Project Structure
+
+```
+CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/
+├── .github/
+│   └── workflows/
+│       └── daily_pipeline.yml       # Automated daily execution
+├── data/
+│   ├── raw/                         # Historical price data
+│   ├── processed/                   # Feature-engineered datasets
+│   └── results/                     # Portfolio weights & signals
+├── images/                          # Screenshots & visualizations
+├── notebooks/
+│   ├── 01_EDA.ipynb                 # Exploratory data analysis
+│   ├── 02_Model_Training.ipynb      # ML model development
+│   └── 03_Backtesting.ipynb         # Strategy validation
 ├── src/
-│   ├── models/           # Pre-trained .pkl models (XGBoost/KMeans)
-│   └── utils/            # Helper functions
-├── app.py                # Streamlit Dashboard Entry Point
-├── daily_run.py          # Main Pipeline Script (ETL + Inference)
-└── requirements.txt      # Python Dependencies
+│   ├── models/
+│   │   ├── xgboost_model.pkl        # Trained predictor
+│   │   └── kmeans_model.pkl         # Regime classifier
+│   ├── utils/
+│   │   ├── data_loader.py           # ETL functions
+│   │   ├── feature_engineering.py   # Indicator calculations
+│   │   ├── optimization.py          # Portfolio allocation
+│   │   └── evaluation.py            # Performance metrics
+│   └── config.py                    # Centralized configuration
+├── app.py                           # Streamlit dashboard
+├── daily_run.py                     # Main pipeline orchestrator
+├── requirements.txt                 # Python dependencies
+├── LICENSE                          # MIT License
+└── README.md                        # You are here!
+```
 
-🌍 How to Fork & Adapt
+---
 
-Want to apply this strategy to the S&P 500 or Crypto?
+## 🔧 Customization Guide
 
-    Fork this repo (Top right corner).
+### Adapting to Other Markets
 
-    Edit daily_run.py: Change the CAC40_TICKERS list to your desired assets.
+Want to apply this strategy to S&P 500, FTSE 100, or cryptocurrencies?
 
-    Push changes: The automated pipeline will immediately start processing your new tickers.
+1. **Fork this repository** (click the Fork button above)
 
-⚠️ Disclaimer
+2. **Modify the ticker list** in `src/config.py`:
+```python
+# Example: Switch to S&P 500
+TICKERS = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', ...]
+BENCHMARK = '^GSPC'  # S&P 500 index
+```
 
-This project is for educational and research purposes only. It does not constitute financial advice. Algorithmic trading involves substantial risk of loss. Past performance is not indicative of future results.
+3. **Retrain models** (optional but recommended):
+```bash
+python notebooks/02_Model_Training.ipynb
+```
+
+4. **Push changes** and the automated pipeline handles the rest!
+
+### Tuning Parameters
+
+Key configuration options in `src/config.py`:
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `LOOKBACK_PERIOD` | Historical window for features | 252 days |
+| `N_CLUSTERS` | Market regimes for K-Means | 3 |
+| `RISK_AVERSION` | Portfolio risk tolerance | 2.5 |
+| `MAX_WEIGHT` | Position size limit per asset | 0.15 |
+| `REBALANCE_THRESHOLD` | Trigger for portfolio adjustment | 5% |
+
+---
+
+## 📚 Technical Deep Dive
+
+### Feature Engineering
+
+The model uses 50+ features across multiple categories:
+
+- **Price-based:** Returns (1d, 5d, 20d), log-returns, price ratios
+- **Technical Indicators:** RSI, MACD, Bollinger Bands, ATR, Stochastic Oscillator
+- **Volume Metrics:** OBV, Volume MA ratios, VWAP
+- **Volatility Measures:** Historical vol, Parkinson estimator, Garman-Klass
+- **Market Microstructure:** Bid-ask spread proxies, Amihud illiquidity
+
+### Model Training
+
+**XGBoost Classifier:**
+- Binary classification (up/down next day)
+- Custom weighted loss function (asymmetric)
+- 5-fold time-series cross-validation
+- Hyperparameter tuning via Optuna
+
+**K-Means Clustering:**
+- Applied to 10 macro features (volatility, momentum, correlation)
+- Elbow method + Silhouette score for optimal K
+- Regime labels: Bull (0), Neutral (1), Bear (2)
+
+### Portfolio Optimization
+
+Implements **Markowitz Mean-Variance Optimization** with:
+- Expected returns via **exponentially weighted moving average** (EWMA)
+- Covariance matrix via **Ledoit-Wolf shrinkage** (addresses estimation error)
+- Constraints: Long-only, box constraints, sector limits
+- Objective: Maximize Sharpe ratio with L2 regularization
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Here's how you can help:
+
+1. **Report bugs** via [GitHub Issues](https://github.com/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/issues)
+2. **Suggest features** in the Discussions tab
+3. **Submit pull requests** following the code style guidelines
+
+### Development Setup
+
+```bash
+# Install development dependencies
+pip install -r requirements-dev.txt
+
+# Run linting
+black src/ --check
+flake8 src/
+
+# Run tests
+pytest tests/
+```
+
+---
+
+## 📖 Research & References
+
+This project builds upon:
+
+- Markowitz, H. (1952). "Portfolio Selection". *Journal of Finance*
+- Friedman, J. et al. (2001). "Greedy Function Approximation: A Gradient Boosting Machine"
+- Ledoit, O. & Wolf, M. (2004). "Honey, I Shrunk the Sample Covariance Matrix"
+- Bailey, D. et al. (2017). "Stock Portfolio Design and Backtest Overfitting". *Journal of Investment Management*
+
+
+---
+
+## ⚠️ Disclaimer
+
+**This project is for educational and research purposes only.**
+
+- ❌ Not financial advice or investment recommendations
+- ❌ No guarantee of profitability or performance
+- ❌ Past results do not predict future outcomes
+- ⚠️ Algorithmic trading involves substantial risk of capital loss
+
+Always consult with a licensed financial advisor before making investment decisions.
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+You are free to use, modify, and distribute this code with attribution.
+
+---
+
+## 🙏 Acknowledgments
+
+Developed as part of the **Master 2 - Statistics Expertise for Finance & Economics** program at **Université de Lorraine**.
+
+Special thanks to:
+- Professor [Name] for guidance on quantitative methods
+- The open-source community for libraries (Streamlit, scikit-learn, PyPortfolioOpt)
+- CAC40 companies for providing publicly available data
+
+---
 
 <div align="center">
 
-Developed by SORADATA
+### 💡 Found this useful?
 
-Master 2 Statistics & Econometrics
+⭐ **Star this repo** to show support!
 
-⭐ Star this repo if you find it useful!
+🔀 **Fork it** to build your own strategy!
+
+📢 **Share it** with fellow quants and developers!
+
+---
+
+**Developed by [SORADATA](https://github.com/SORADATA)**
+
+*Master 2 Statistics & Econometrics | Université de Lorraine*
+
+[![GitHub followers](https://img.shields.io/github/followers/SORADATA?style=social)](https://github.com/SORADATA)
+[![Twitter Follow](https://img.shields.io/twitter/follow/SORADATA?style=social)](https://twitter.com/SORADATA)
 
 </div>
