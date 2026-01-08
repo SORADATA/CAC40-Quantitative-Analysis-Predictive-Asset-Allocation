@@ -12,7 +12,7 @@ Combining Unsupervised Learning, XGBoost & Modern Portfolio Theory for Automated
 [![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/graphs/commit-activity)
 
-[🌐 **Live Dashboard**](https://cac40-quantitative-analysis.streamlit.app/) • [📊 **View Results**](#-performance-metrics) • [🚀 **Quick Start**](#-quick-start) • [🐛 **Report Issue**](https://github.com/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/issues)
+[🌐 **Live Dashboard**](https://cac40-smart-portfolio-asset.streamlit.app/) • [📊 **View Results**](#-performance-metrics) • [🚀 **Quick Start**](#-quick-start) • [🐛 **Report Issue**](https://github.com/SORADATA/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/issues)
 
 </div>
 
@@ -82,7 +82,7 @@ Traditional portfolio management relies on static allocations and reactive rebal
 | **Win Rate** | TBD | N/A |
 | **Volatility (σ)** | TBD | TBD |
 
-*Metrics updated daily. View real-time performance on the [live dashboard](https://cac40-quantitative-analysis.streamlit.app/).*
+*Metrics updated daily. View real-time performance on the [live dashboard](https://cac40-smart-portfolio-asset.streamlit.app/).*
 
 ---
 
@@ -314,7 +314,7 @@ This project builds upon:
 - ❌ Not financial advice or investment recommendations
 - ❌ No guarantee of profitability or performance
 - ❌ Past results do not predict future outcomes
-- ⚠️ Algorithmic trading involves substantial risk of capital loss
+- ⚠️ Algorithmic trading involves substantial risk of capital loss 
 
 Always consult with a licensed financial advisor before making investment decisions.
 
