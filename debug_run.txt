@@ -1,12 +1,12 @@
-Run finished at 2026-01-09 18:22:45.646719
-Daily data shape: (100617, 14)
+Run finished at 2026-01-12 18:23:04.919033
+Daily data shape: (100618, 14)
 Monthly data shape: (4713, 26)
 Selected stocks: 13
-Allocations: OrderedDict([('AIR.PA', 0.02), ('BNP.PA', 0.02), ('CAP.PA', 0.02), ('EN.PA', 0.16358), ('ENGI.PA', 0.25), ('ERF.PA', 0.08583), ('GLE.PA', 0.25), ('HO.PA', 0.09058), ('MC.PA', 0.02), ('ML.PA', 0.02), ('MT.AS', 0.02), ('SAF.PA', 0.02), ('STMPA.PA', 0.02)])
+Allocations: OrderedDict([('AIR.PA', 0.02), ('ATO.PA', 0.07035), ('BNP.PA', 0.02), ('EN.PA', 0.13069), ('ENGI.PA', 0.25), ('ERF.PA', 0.09035), ('GLE.PA', 0.25), ('HO.PA', 0.06861), ('ML.PA', 0.02), ('MT.AS', 0.02), ('OR.PA', 0.02), ('SAF.PA', 0.02), ('STMPA.PA', 0.02)])
 
 === Latest Values ===
-Strategy: 228.57
-Benchmark: 193.81
+Strategy: 229.03
+Benchmark: 193.73
 
 === File Paths ===
 Project root: /home/runner/work/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation
