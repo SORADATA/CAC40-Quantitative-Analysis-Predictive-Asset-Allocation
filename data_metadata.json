@@ -1,19 +1,20 @@
 {
-  "last_update": "2026-01-15T18:31:16.886791",
-  "data_start": "2016-01-15T00:00:00",
-  "data_end": "2026-01-15T00:00:00",
+  "last_update": "2026-01-16T18:23:34.504905",
+  "data_start": "2016-01-18T00:00:00",
+  "data_end": "2026-01-16T00:00:00",
   "n_stocks": 40,
-  "n_selected": 10,
+  "n_selected": 11,
   "allocations": {
     "AIR.PA": 0.02,
     "ALO.PA": 0.02,
-    "ATO.PA": 0.06311,
+    "ATO.PA": 0.06686,
     "BNP.PA": 0.02,
     "ENGI.PA": 0.25,
-    "ERF.PA": 0.06983,
+    "ERF.PA": 0.04758,
     "GLE.PA": 0.25,
+    "HO.PA": 0.0203,
     "ML.PA": 0.02,
-    "MT.AS": 0.03706,
+    "MT.AS": 0.03527,
     "ORA.PA": 0.25
   },
   "data_files": {
