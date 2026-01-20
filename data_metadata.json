@@ -1,18 +1,15 @@
 {
-  "last_update": "2026-01-19T18:22:55.626756",
-  "data_start": "2016-01-19T00:00:00",
-  "data_end": "2026-01-19T00:00:00",
+  "last_update": "2026-01-20T18:28:42.928684",
+  "data_start": "2016-01-20T00:00:00",
+  "data_end": "2026-01-20T00:00:00",
   "n_stocks": 40,
-  "n_selected": 8,
+  "n_selected": 5,
   "allocations": {
-    "ALO.PA": 0.02,
-    "BNP.PA": 0.02,
-    "ENGI.PA": 0.25,
-    "ERF.PA": 0.08342,
-    "GLE.PA": 0.25,
-    "HO.PA": 0.05602,
-    "MT.AS": 0.07056,
-    "ORA.PA": 0.25
+    "BNP.PA": 0.08216,
+    "ENGI.PA": 0.4,
+    "ERF.PA": 0.15777,
+    "HO.PA": 0.15451,
+    "MT.AS": 0.20556
   },
   "data_files": {
     "daily_raw": "/home/runner/work/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/data/raw/cac40_daily_raw.parquet",
