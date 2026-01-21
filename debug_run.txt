@@ -1,4 +1,4 @@
-Run finished at 2026-01-21 18:52:48.462735
+Run finished at 2026-01-21 18:54:15.532030
 Daily data shape: (100625, 14)
 Monthly data shape: (4713, 26)
 Selected stocks: 6
