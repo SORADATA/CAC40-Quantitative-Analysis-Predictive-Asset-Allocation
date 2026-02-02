@@ -1,17 +1,19 @@
 {
-  "last_update": "2026-01-30T18:33:01.635088",
-  "data_start": "2016-02-01T00:00:00",
-  "data_end": "2026-01-30T00:00:00",
+  "last_update": "2026-02-02T18:37:14.118314",
+  "data_start": "2016-02-02T00:00:00",
+  "data_end": "2026-02-02T00:00:00",
   "n_stocks": 40,
-  "n_selected": 8,
+  "n_selected": 10,
   "allocations": {
     "BNP.PA": 0.02,
+    "EN.PA": 0.0429,
     "ENGI.PA": 0.25,
-    "GLE.PA": 0.25,
+    "GLE.PA": 0.23337,
+    "LR.PA": 0.07612,
     "ML.PA": 0.02,
-    "MT.AS": 0.14667,
+    "MT.AS": 0.06761,
     "ORA.PA": 0.25,
-    "TTE.PA": 0.04333,
+    "TTE.PA": 0.02,
     "VIE.PA": 0.02
   },
   "data_files": {
