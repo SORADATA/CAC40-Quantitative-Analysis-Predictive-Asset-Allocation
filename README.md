@@ -274,6 +274,21 @@ Implements **Markowitz Mean-Variance Optimization** with:
 
 ---
 
+🔧 Configuration (Multi-Market)
+You can adapt this strategy to any market (S&P 500, Crypto, Nasdaq) without changing the code. Simply edit the config/market_config.json file:
+
+JSON
+{
+  "market_name": "S&P 500 Tech",
+  "benchmark_ticker": "^GSPC",
+  "assets": [
+    "AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "TSLA"
+  ]
+}
+The pipeline will automatically download new data, retrain models, and optimize weights for these assets.
+
+---
+
 ## 🤝 Contributing
 
 Contributions are welcome! Here's how you can help:
