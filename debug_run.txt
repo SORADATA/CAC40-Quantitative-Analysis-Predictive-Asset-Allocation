@@ -1,13 +1,3 @@
-Run finished at 2026-02-05 18:46:22.163564
-Daily data shape: (100636, 14)
-Monthly data shape: (4714, 26)
-Selected stocks: 14
-Allocations: OrderedDict([('AI.PA', 0.02), ('ALO.PA', 0.02), ('BNP.PA', 0.02), ('CA.PA', 0.02), ('ENGI.PA', 0.25), ('GLE.PA', 0.15756), ('LR.PA', 0.06105), ('ML.PA', 0.02), ('MT.AS', 0.10139), ('ORA.PA', 0.25), ('RI.PA', 0.02), ('TTE.PA', 0.02), ('URW.PA', 0.02), ('VIE.PA', 0.02)])
-
-=== Latest Values ===
-Strategy: 223.02
-Benchmark: 185.36
-
-=== File Paths ===
-Project root: /home/runner/work/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation
-History file: /home/runner/work/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/CAC40-Quantitative-Analysis-Predictive-Asset-Allocation/portfolio_history.csv
+Success: 2026-02-06 16:40:19.773838
+Market: CAC 40 (France)
+Assets: 40

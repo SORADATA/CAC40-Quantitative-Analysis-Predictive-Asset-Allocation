@@ -1,11 +1,10 @@
 {
-  "date": "2026-01-08T08:50:10.952537",
-  "total_tickers_requested": 40,
-  "valid_tickers": 40,
+  "date": "2026-02-06 16:40:10.983507",
   "alerts": {
     "delisted": [],
     "stale": [],
     "missing": [],
     "warnings": []
-  }
+  },
+  "valid_tickers": 40
 }
