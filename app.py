@@ -492,9 +492,10 @@ elif page == "Daily Signals":
             filter_opt = st.selectbox("Filter", ["All Signals", "BUY Only", "NEUTRAL Only"])
         
         if filter_opt == "BUY Only":
-            d = d[d['Signal'] == 'ACHAT']
+            d = d[d['Signal'] == 'BUY']
         elif filter_opt == "NEUTRAL Only":
-            d = d[d['Signal'] == 'NEUTRE']
+            d = d[d['Signal'] == 'NEUTRAL']
+        
         
         st.dataframe(
             d, 
