@@ -1,26 +1,24 @@
 {
   "market_name": "CAC 40 (France)",
-  "last_update": "2026-02-26T18:56:38.534121",
-  "data_start": "2016-02-26T00:00:00",
+  "last_update": "2026-02-27T18:35:01.349358",
+  "data_start": "2016-02-29T00:00:00",
   "n_assets_tracked": 40,
   "current_allocation": {
     "AI.PA": 0.02,
     "BNP.PA": 0.02,
-    "CA.PA": 0.0256,
+    "CA.PA": 0.06338,
     "CS.PA": 0.02,
     "DG.PA": 0.02,
     "EN.PA": 0.02,
     "ENGI.PA": 0.25,
-    "LR.PA": 0.07339,
+    "LR.PA": 0.1021,
     "ML.PA": 0.02,
-    "MT.AS": 0.14101,
+    "MT.AS": 0.11452,
     "ORA.PA": 0.25,
-    "SAF.PA": 0.02,
     "STMPA.PA": 0.02,
     "SU.PA": 0.02,
     "TTE.PA": 0.02,
-    "URW.PA": 0.02,
     "VIE.PA": 0.02,
-    "WLN.PA": 0.02
+    "URW.PA": 0.02
   }
 }
